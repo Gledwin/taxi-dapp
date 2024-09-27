@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount } from "wagmi";
 import { createNewRide } from "@/services/createNewRide";
 import { useRouter } from "next/navigation";
 

@@ -1,8 +1,8 @@
-import { createPublicClient,  custom } from "viem";
+import { createPublicClient, custom } from "viem";
 import { celoAlfajores } from "viem/chains";
 import { taxiContractABI } from "@/utils/abis/taxiContractABI";
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
-import { TaxiUser} from "@/entities/taxiUser";
+import { TaxiUser } from "@/entities/taxiUser";
 
 export const getUserByWalletAddress = async (
   _signerAddress: `0x${string}` | undefined,
@@ -19,7 +19,7 @@ export const getUserByWalletAddress = async (
         address: taxiContractAddress,
         abi: taxiContractABI,
         functionName: "getUserByWalletAddress",
-        args: [_signerAddress],
+        args: [_walletAddress], // Use _walletAddress here
       }) as any;
 
       taxiUser = {
