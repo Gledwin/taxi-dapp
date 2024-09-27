@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     env :{
-        WALLETCONNECT_PROJECT_ID: process.env.WALLETCONNECT_PROJECT_ID!,
+        WALLETCONNECT_PROJECT_ID: "process.env.WALLETCONNECT_PROJECT_ID!",
     },
     reactStrictMode: true,
     swcMinify: true,
