@@ -11,6 +11,7 @@ export default function CreateRide() {
   const [numPassengers, setNumPassengers] = useState(1);
   const [totalFare, setTotalFare] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-varss
   const [error, setError] = useState(""); // Defined and used here
   const router = useRouter();
 
@@ -59,7 +60,7 @@ export default function CreateRide() {
       <h2 className="text-2xl font-bold pb-4 text-blue-700 drop-shadow-lg"> Create a Ride!</h2>
 
       <form className="flex flex-col gap-6 w-full max-w-md p-6 bg-white rounded-lg shadow-lg border border-blue-500" onSubmit={handleCreateRide}>
-        {error && <p className="text-red-500 font-semibold">{error}</p>} {/* Utilizing the error state */}
+      {error && <p className="text-red-500 font-semibold">{error}</p>} {/* Utilizing the error state */}
 
         <div className="flex flex-col">
           <label className="text-blue-600 font-medium" htmlFor="rideName">🎈 Ride Name</label>
