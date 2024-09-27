@@ -1,6 +1,43 @@
 export const taxiContractABI =
 [
 	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "cUSD",
+		"outputs": [
+			{
+				"internalType": "contract ERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_walletAddress",
+				"type": "address"
+			}
+		],
+		"name": "checkIfUserExists",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -166,56 +203,6 @@ export const taxiContractABI =
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_rideId",
-				"type": "uint256"
-			}
-		],
-		"name": "payForRide",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_walletAddress",
-				"type": "address"
-			}
-		],
-		"name": "checkIfUserExists",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "cUSD",
-		"outputs": [
-			{
-				"internalType": "contract ERC20",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "getAllPayments",
 		"outputs": [
@@ -242,6 +229,11 @@ export const taxiContractABI =
 						"type": "uint256"
 					},
 					{
+						"internalType": "uint256",
+						"name": "paidAt",
+						"type": "uint256"
+					},
+					{
 						"internalType": "bool",
 						"name": "isPaid",
 						"type": "bool"
@@ -263,6 +255,82 @@ export const taxiContractABI =
 	{
 		"inputs": [],
 		"name": "getAllRides",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "driverWalletAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "destination",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "fareInEthers",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "createdAt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "updatedAt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isCompleted",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isPaid",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isBlank",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "numPassengers",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalFare",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct Ride[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_driverAddress",
+				"type": "address"
+			}
+		],
+		"name": "getDriverRides",
 		"outputs": [
 			{
 				"components": [
@@ -360,6 +428,11 @@ export const taxiContractABI =
 					{
 						"internalType": "uint256",
 						"name": "amountPaidInEthers",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "paidAt",
 						"type": "uint256"
 					},
 					{
@@ -506,6 +579,19 @@ export const taxiContractABI =
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_rideId",
+				"type": "uint256"
+			}
+		],
+		"name": "payForRide",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

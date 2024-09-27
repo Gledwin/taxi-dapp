@@ -9,6 +9,6 @@ const config = extendTheme({
   },
 });
 
-const stekcitBwCTheme = extendTheme({ config })
+const Theme = extendTheme({ config })
 
-export default stekcitBwCTheme
+export default Theme

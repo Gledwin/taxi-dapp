@@ -1,6 +1,5 @@
 "use client";
 
-import StekcitNavBar from "../components/navbar";
 import { fonts } from "./fonts";
 import { ThemeProvider } from "./providers";
 
@@ -24,9 +23,10 @@ import {
 import "./globals.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import NavBar from "../components/navbar";
 
 const config = getDefaultConfig({
-  appName: "Stekcit BwC",
+  appName: "Taxi System",
   projectId: process.env.WALLETCONNECT_PROJECT_ID!,
   chains: [celo, celoAlfajores],
   transports: {
@@ -65,14 +65,14 @@ export default function RootLayout({
             <QueryClientProvider client={queryClient}>
               <RainbowKitProvider
                 theme={lightTheme({
-                  accentColor: "#EA1845",
+                  accentColor: "blue",
                   accentColorForeground: "white",
                   borderRadius: "large",
                   fontStack: "rounded",
                   overlayBlur: "small",
                 })}
               >
-                <StekcitNavBar />
+                <NavBar />
                 <div>{children}</div>
               </RainbowKitProvider>
             </QueryClientProvider>

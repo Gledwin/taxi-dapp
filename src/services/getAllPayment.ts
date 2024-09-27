@@ -21,16 +21,16 @@ export const getAllPayments = async (): Promise<Payment[]> => {
       for (let paymentId = 0; paymentId < fetchedPayments.length; paymentId++) {
         const paymentToBeParsed = fetchedPayments[paymentId];
         const payment: Payment = {
-            id: Number(paymentToBeParsed["id"]),
-            rideId: Number(paymentToBeParsed["rideId"]),
-            passengerWalletAddress: paymentToBeParsed["passengerWalletAddress"],
-            amountPaidInEthers: Number(paymentToBeParsed["amountPaidInEthers"]),
-            isBlank: false,
-          
+          id: Number(paymentToBeParsed["id"]),
+          rideId: Number(paymentToBeParsed["rideId"]),
+          passengerWalletAddress: paymentToBeParsed["passengerWalletAddress"],
+          amountPaidInEthers: Number(paymentToBeParsed["amountPaidInEthers"]),
+          paidAt: Number(paymentToBeParsed["paidAt"]),
+          isBlank: false,
         };
         allPayments.push(payment);
       }
-
+  
       return allPayments;
     } catch (err) {
       console.info(err);

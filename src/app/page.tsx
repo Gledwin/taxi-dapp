@@ -6,12 +6,13 @@ import BecomeAUser from "./become-a-user/page";
 import { TaxiUser } from "@/entities/taxiUser";
 import { getUserByWalletAddress } from "@/services/getUserByWalletAddress";
 import { checkIfUserExists } from "@/services/checkIfUserExists";
-import { getAllRides } from "@/services/getAllRides";
 import { getAllPayments } from "@/services/getAllPayment";
 import { Ride } from "@/entities/taxiRide";
 import { Payment } from "@/entities/payments";
 import { useRouter } from "next/navigation";
 import { payForRide } from "@/services/payForRide";
+import { completeRide } from "@/services/completeRide";
+import { getDriverRides } from "@/services/getDriverRides"; // Import getDriverRides service
 
 export default function Home() {
   const [userExists, setUserExists] = useState(false);
@@ -27,26 +28,33 @@ export default function Home() {
       if (isConnected && address) {
         try {
           setIsLoading(true);
-
+  
           const doesUserExist = await checkIfUserExists(address);
           setUserExists(doesUserExist);
-
+  
           if (doesUserExist) {
             const fetchedTaxiUser = await getUserByWalletAddress(address, {
               _walletAddress: address as `0x${string}`,
             });
-            setTaxiUser(fetchedTaxiUser);
-
-            const allRides = await getAllRides();
-            setRides(allRides);
-
+  
+            // Check if fetchedTaxiUser is not null before accessing its properties
+            if (fetchedTaxiUser) {
+              setTaxiUser(fetchedTaxiUser);
+  
+              if (fetchedTaxiUser.isDriver) {
+                // Fetch rides specifically created by the driver
+                const driverRides = await getDriverRides(address);
+                setRides(driverRides);
+              }
+            }
+            
             const allPayments = await getAllPayments();
             const userPayments = allPayments.filter(
               (payment) => payment.passengerWalletAddress === address
             );
             setPayments(userPayments);
           }
-
+  
           setIsLoading(false);
         } catch (error) {
           console.error("Error checking user existence or fetching data:", error);
@@ -56,27 +64,65 @@ export default function Home() {
         setIsLoading(false);
       }
     };
-
+  
     initializeUser();
   }, [address, isConnected]);
+  
 
   const handlePayForRide = async (rideId: number) => {
-    const fareAmount = rides.find((ride) => ride.id === rideId)?.fareInEthers;
-
-    if (fareAmount !== undefined) {
-        // Directly use fareAmount without converting to BigInt
-        const success = await payForRide(address as `0x${string}`, rideId, fareAmount);
-        
-        if (success) {
+    const ride = rides.find((ride) => ride.id === rideId);
+  
+    if (ride) {
+      const fareAmount = BigInt(ride.fareInEthers);
+  
+      if (fareAmount !== undefined) {
+        try {
+          const success = await payForRide(address as `0x${string}`, {
+            _rideId: rideId,
+            fareAmount: fareAmount,
+          });
+  
+          if (success) {
             alert(`Payment for ride ${rideId} successful!`);
-        } else {
+          } else {
             alert(`Payment for ride ${rideId} failed.`);
+          }
+        } catch (error) {
+          console.error("Payment failed due to an error:", error);
+          alert(`Payment for ride ${rideId} encountered an error.`);
         }
+      } else {
+        alert("Fare amount not found.");
+      }
     } else {
-        alert("Ride not found.");
+      alert("Ride not found.");
     }
-};
+  };
+  
+  // handleCompleteRide function for drivers
+  const handleCompleteRide = async (rideId: number) => {
+    try {
+      const success = await completeRide(address as `0x${string}`, {
+        _rideId: rideId,
+      });
 
+      if (success) {
+        alert(`Ride ${rideId} marked as complete!`);
+
+        // Update the ride status in the front-end state
+        setRides((prevRides) =>
+          prevRides.map((ride) =>
+            ride.id === rideId ? { ...ride, isCompleted: true } : ride
+          )
+        );
+      } else {
+        alert(`Failed to mark ride ${rideId} as complete.`);
+      }
+    } catch (error) {
+      console.error("Error completing ride:", error);
+      alert(`Error completing ride ${rideId}.`);
+    }
+  };
 
   if (!isConnected) {
     return (
@@ -104,112 +150,148 @@ export default function Home() {
         </p>
       </div>
       {userExists ? (
-  <main className="flex flex-col items-center p-6 bg-gray-800 shadow-lg">
-    <h4 className="text-2xl font-bold pt-4 pb-2 text-white">
-      Welcome, {taxiUser?.username || "Valued User"}! 
-    </h4>
+        <main className="flex flex-col items-center p-6 bg-gray-800 shadow-lg">
+          <h4 className="text-2xl font-bold pt-4 pb-2 text-white">
+            Welcome, {taxiUser?.username || "Valued User"}!
+          </h4>
 
-    {taxiUser?.isDriver ? (
-      <div className="mt-6 flex flex-col gap-6 items-center">
-        <p className="text-gray-300 text-center">
-          As a driver, you play a vital role in our community! Create rides effortlessly and provide passengers with seamless, cashless journeys.
-        </p>
-        <button
-          className="bg-blue-600 text-white px-6 py-2  transition-transform transform hover:scale-105"
-          onClick={() => router.push("/createRide")}
-        >
-          Create a Ride
-        </button>
+          {!taxiUser?.isDriver ? (
+            // Passenger view
+            <div className="mt-6 flex flex-col gap-6 items-center">
+              <p className="text-gray-300 text-center">
+                Enjoy seamless cashless rides! Book your journey easily, knowing your payments are secure.
+              </p>
 
-        <div className="mt-6 bg-gray-700 p-6 rounded-lg shadow-md w-full max-w-xl">
-          <h5 className="text-white font-bold mb-4 text-xl text-center">
-            Manage Your Rides 🚕
-          </h5>
-          {rides.length > 0 ? (
-            <ul className="bg-gray-800 p-4 rounded-lg shadow-md divide-y divide-gray-600">
-              {rides.map((ride) => (
-                <li
-                  key={ride.id}
-                  className="py-4 px-4 rounded-lg mb-2 transition hover:bg-gray-600 flex justify-between items-center"
+    <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+      <h5 className="text-black font-bold mb-2">Available Rides</h5>
+      {rides.length > 0 ? (
+        <ul className="space-y-4">
+          {rides
+            .filter((ride) => !ride.isCompleted) // Filter out completed rides for passengers
+            .map((ride) => (
+              <li
+                key={ride.id}
+                className="bg-gray-200 p-4 rounded-lg shadow-md"
+              >
+                <p>
+                  <strong>Destination:</strong> {ride.destination}
+                </p>
+                <p>
+                  <strong>Fare per Passenger:</strong> {ride.fareInEthers} ETH
+                </p>
+                <p>
+                  <strong>Passengers:</strong> {ride.numPassengers}
+                </p>
+                <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
+                  onClick={() => handlePayForRide(ride.id)} // Pay for Ride button for passengers
                 >
-                  <div className="flex flex-col">
-                    <p className="text-lg font-semibold text-gray-300">
-                      <span>Destination:</span> {ride.destination}
-                    </p>
-                    <p className="text-gray-400">
-                      <strong>Fare per Passenger:</strong> {ride.fareInEthers} ETH
-                    </p>
-                    <p className="text-gray-400">
-                      <strong>Passengers:</strong> {ride.numPassengers}
-                    </p>
-                    <p className="text-gray-400">
-                      <strong>Total Fare:</strong> {ride.totalFare} ETH
-                    </p>
-                    <p className="text-gray-500 text-sm">
-                      <strong>Created At:</strong> {new Date(ride.createdAt * 1000).toLocaleString()}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-center text-gray-500">
-              No rides created yet. Let's get started!
-            </p>
-          )}
-        </div>
-      </div>
-    ) : (
-      <div className="mt-6 flex flex-col gap-6 items-center">
-        <p className="text-gray-300 text-center">
-          Enjoy seamless cashless rides! Book your journey easily, knowing your payments are secure.
-        </p>
+                  Pay for Ride
+                </button>
+              </li>
+            ))}
+        </ul>
+      ) : (
+        <p>No rides available.</p>
+      )}
+    </div>
 
-        <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
-          <h5 className="text-black font-bold mb-2">Available Rides</h5>
-          {rides.length > 0 ? (
-            <ul className="bg-white p-4 rounded-lg shadow-md">
-              {rides.map((ride) => (
-                <li key={ride.id} className="border-b py-3">
-                  <p><strong>Destination:</strong> {ride.destination}</p>
-                  <p><strong>Fare:</strong> {ride.fareInEthers} ETH</p>
-                  <p><strong>Created At:</strong> {new Date(ride.createdAt * 1000).toLocaleString()}</p>
-                  <button
-                    className="bg-green-600 text-white px-4 py-2 rounded mt-2 transition-transform transform hover:scale-105"
-                    onClick={() => handlePayForRide(ride.id)}
-                  >
-                    Pay for Ride
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No rides available. Check back soon!</p>
-          )}
-        </div>
+    {/* Display the list of payments for passengers */}
+    <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+      <h5 className="text-black font-bold mb-2">Your Payments</h5>
+      {payments.length > 0 ? (
+        <ul className="space-y-4">
+          {payments.map((payment) => (
+            <li
+              key={payment.id}
+              className="bg-gray-200 p-4 rounded-lg shadow-md"
+            >
+              <p>
+                <strong>Ride ID:</strong> {payment.rideId}
+              </p>
+              <p>
+                <strong>Amount Paid:</strong> {payment.amountPaidInEthers} ETH
+              </p>
+              <p>
+               <strong>Paid At:</strong> {new Date(payment.paidAt).toLocaleString()}
+              </p>
 
-        <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
-          <h5 className="text-black font-bold mb-2">Your Payments</h5>
-          {payments.length > 0 ? (
-            <ul className="bg-white p-4 rounded-lg shadow-md">
-              {payments.map((payment) => (
-                <li key={payment.id} className="border-b py-2">
-                  <p><strong>Ride ID:</strong> {payment.rideId}</p>
-                  <p><strong>Amount Paid:</strong> {payment.amountPaidInEthers / 1e18} ETH</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No payments made yet. Start your journey today!</p>
-          )}
-        </div>
-      </div>
-    )}
-  </main>
-) : (
-  <BecomeAUser />
-)}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No payments found.</p>
+      )}
+    </div>
 
+            </div>
+          ) : (
+            // Driver view
+            <div className="mt-6 flex flex-col gap-6 items-center">
+              <p className="text-gray-300 text-center">
+                As a driver, you play a vital role in our community! Create rides effortlessly and provide passengers with seamless, cashless journeys.
+              </p>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 transition-transform transform hover:scale-105"
+                onClick={() => router.push("/createRide")}
+              >
+                Create a Ride
+              </button>
+
+              <div className="mt-6 bg-gray-700 p-6 rounded-lg shadow-md w-full max-w-xl">
+                <h5 className="text-white font-bold mb-4 text-xl text-center">
+                  Manage Your Rides 🚕
+                </h5>
+                {rides.length > 0 ? (
+                  <ul className="bg-gray-800 p-4 rounded-lg shadow-md divide-y divide-gray-600">
+                    {rides.map((ride) => (
+                      <li
+                        key={ride.id}
+                        className={`py-4 px-4 rounded-lg mb-2 transition hover:bg-gray-600 flex justify-between items-center ${
+                          ride.isCompleted ? "bg-gray-700 opacity-50" : ""
+                        }`}
+                      >
+                        <div className="flex flex-col">
+                          <p className="text-lg font-semibold text-gray-300">
+                            <span>Destination:</span> {ride.destination}
+                          </p>
+                          <p className="text-gray-400">
+                            <strong>Fare per Passenger:</strong> {ride.fareInEthers} ETH
+                          </p>
+                          <p className="text-gray-400">
+                            <strong>Passengers:</strong> {ride.numPassengers}
+                          </p>
+                          <p className="text-gray-400">
+                            <strong>Total Fare:</strong> {ride.totalFare} ETH
+                          </p>
+                          <p className="text-gray-500 text-sm">
+                            <strong>Created At:</strong> {new Date(ride.createdAt * 1000).toLocaleString()}
+                          </p>
+                          <p className={`text-${ride.isCompleted ? "green" : "red"}-500`}>
+                            <strong>Status:</strong> {ride.isCompleted ? "Completed" : "In Progress"}
+                          </p>
+                        </div>
+                        {!ride.isCompleted && (
+                          <button
+                            className="bg-green-600 text-white px-4 py-2 rounded ml-4 transition-transform transform hover:scale-105"
+                            onClick={() => handleCompleteRide(ride.id)}
+                          >
+                            Complete Ride
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-center text-gray-500">No rides created yet. Let's get started!</p>
+                )}
+              </div>
+            </div>
+          )}
+        </main>
+      ) : (
+        <BecomeAUser />
+      )}
     </>
   );
 }
