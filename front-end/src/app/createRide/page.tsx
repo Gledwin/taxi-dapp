@@ -11,7 +11,8 @@ export default function CreateRide() {
   const [numPassengers, setNumPassengers] = useState(1);
   const [totalFare, setTotalFare] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const [error, setError] = useState("");
   const router = useRouter();
 
   const handleCreateRide = async (e: React.FormEvent) => {

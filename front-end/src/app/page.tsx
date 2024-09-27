@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -162,67 +162,66 @@ export default function Home() {
                 Enjoy seamless cashless rides! Book your journey easily, knowing your payments are secure.
               </p>
 
-    <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
-      <h5 className="text-black font-bold mb-2">Available Rides</h5>
-      {rides.length > 0 ? (
-        <ul className="space-y-4">
-          {rides
-            .filter((ride) => !ride.isCompleted) // Filter out completed rides for passengers
-            .map((ride) => (
-              <li
-                key={ride.id}
-                className="bg-gray-200 p-4 rounded-lg shadow-md"
-              >
-                <p>
-                  <strong>Destination:</strong> {ride.destination}
-                </p>
-                <p>
-                  <strong>Fare per Passenger:</strong> {ride.fareInEthers} ETH
-                </p>
-                <p>
-                  <strong>Passengers:</strong> {ride.numPassengers}
-                </p>
-                <button
-                  className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
-                  onClick={() => handlePayForRide(ride.id)} // Pay for Ride button for passengers
-                >
-                  Pay for Ride
-                </button>
-              </li>
-            ))}
-        </ul>
-      ) : (
-        <p>No rides available.</p>
-      )}
-    </div>
+              <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+                <h5 className="text-black font-bold mb-2">Available Rides</h5>
+                {rides.length > 0 ? (
+                  <ul className="space-y-4">
+                    {rides
+                      .filter((ride) => !ride.isCompleted) // Filter out completed rides for passengers
+                      .map((ride) => (
+                        <li
+                          key={ride.id}
+                          className="bg-gray-200 p-4 rounded-lg shadow-md"
+                        >
+                          <p>
+                            <strong>Destination:</strong> {ride.destination}
+                          </p>
+                          <p>
+                            <strong>Fare per Passenger:</strong> {ride.fareInEthers} ETH
+                          </p>
+                          <p>
+                            <strong>Passengers:</strong> {ride.numPassengers}
+                          </p>
+                          <button
+                            className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
+                            onClick={() => handlePayForRide(ride.id)} // Pay for Ride button for passengers
+                          >
+                            Pay for Ride
+                          </button>
+                        </li>
+                      ))}
+                  </ul>
+                ) : (
+                  <p>No rides available.</p>
+                )}
+              </div>
 
-    {/* Display the list of payments for passengers */}
-    <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
-      <h5 className="text-black font-bold mb-2">Your Payments</h5>
-      {payments.length > 0 ? (
-        <ul className="space-y-4">
-          {payments.map((payment) => (
-            <li
-              key={payment.id}
-              className="bg-gray-200 p-4 rounded-lg shadow-md"
-            >
-              <p>
-                <strong>Ride ID:</strong> {payment.rideId}
-              </p>
-              <p>
-                <strong>Amount Paid:</strong> {payment.amountPaidInEthers} ETH
-              </p>
-              <p>
-               <strong>Paid At:</strong> {new Date(payment.paidAt).toLocaleString()}
-              </p>
-
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No payments found.</p>
-      )}
-    </div>
+              {/* Display the list of payments for passengers */}
+              <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+                <h5 className="text-black font-bold mb-2">Your Payments</h5>
+                {payments.length > 0 ? (
+                  <ul className="space-y-4">
+                    {payments.map((payment) => (
+                      <li
+                        key={payment.id}
+                        className="bg-gray-200 p-4 rounded-lg shadow-md"
+                      >
+                        <p>
+                          <strong>Ride ID:</strong> {payment.rideId}
+                        </p>
+                        <p>
+                          <strong>Amount Paid:</strong> {payment.amountPaidInEthers} ETH
+                        </p>
+                        <p>
+                          <strong>Paid At:</strong> {new Date(payment.paidAt).toLocaleString()}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No payments found.</p>
+                )}
+              </div>
 
             </div>
           ) : (
@@ -248,32 +247,26 @@ export default function Home() {
                       <li
                         key={ride.id}
                         className={`py-4 px-4 rounded-lg mb-2 transition hover:bg-gray-600 flex justify-between items-center ${
-                          ride.isCompleted ? "bg-gray-700 opacity-50" : ""
+                          ride.isCompleted ? "bg-green-500" : "bg-gray-700"
                         }`}
                       >
-                        <div className="flex flex-col">
-                          <p className="text-lg font-semibold text-gray-300">
-                            <span>Destination:</span> {ride.destination}
+                        <div>
+                          <p>
+                            <strong>Ride ID:</strong> {ride.id}
                           </p>
-                          <p className="text-gray-400">
-                            <strong>Fare per Passenger:</strong> {ride.fareInEthers} ETH
+                          <p>
+                            <strong>Destination:</strong> {ride.destination}
                           </p>
-                          <p className="text-gray-400">
+                          <p>
+                            <strong>Fare:</strong> {ride.fareInEthers} ETH
+                          </p>
+                          <p>
                             <strong>Passengers:</strong> {ride.numPassengers}
-                          </p>
-                          <p className="text-gray-400">
-                            <strong>Total Fare:</strong> {ride.totalFare} ETH
-                          </p>
-                          <p className="text-gray-500 text-sm">
-                            <strong>Created At:</strong> {new Date(ride.createdAt * 1000).toLocaleString()}
-                          </p>
-                          <p className={`text-${ride.isCompleted ? "green" : "red"}-500`}>
-                            <strong>Status:</strong> {ride.isCompleted ? "Completed" : "In Progress"}
                           </p>
                         </div>
                         {!ride.isCompleted && (
                           <button
-                            className="bg-green-600 text-white px-4 py-2 rounded ml-4 transition-transform transform hover:scale-105"
+                            className="bg-green-600 text-white px-4 py-1 rounded mt-2"
                             onClick={() => handleCompleteRide(ride.id)}
                           >
                             Complete Ride
@@ -283,7 +276,7 @@ export default function Home() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-center text-gray-500">No rides created yet. Let's get started!</p>
+                  <p className="text-white">No rides available.</p>
                 )}
               </div>
             </div>
