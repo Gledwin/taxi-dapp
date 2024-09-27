@@ -11,8 +11,7 @@ export default function CreateRide() {
   const [numPassengers, setNumPassengers] = useState(1);
   const [totalFare, setTotalFare] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-varss
-  const [error, setError] = useState(""); // Defined and used here
+  const [error, setError] = useState<string | null>(null); // Define as string or null
   const router = useRouter();
 
   const handleCreateRide = async (e: React.FormEvent) => {
@@ -24,21 +23,21 @@ export default function CreateRide() {
     }
 
     setIsSubmitting(true);
-    setError(""); // Reset error before making the request
+    setError(null); // Reset error before making the request
 
     try {
       const newRide = await createNewRide({
         _destination: rideName,
         _fareInEthers: fareInEthers,
         _numPassengers: numPassengers,
-        _totalFare: totalFare
+        _totalFare: totalFare,
       });
 
       if (newRide) {
         alert("Ride successfully created!");
         router.push("/");
       }
-    } catch (error) {
+    } catch (err) {
       setError("Failed to create ride. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -57,13 +56,22 @@ export default function CreateRide() {
 
   return (
     <div className="flex flex-col items-center p-6 bg-gray-800 h-screen">
-      <h2 className="text-2xl font-bold pb-4 text-blue-700 drop-shadow-lg"> Create a Ride!</h2>
+      <h2 className="text-2xl font-bold pb-4 text-blue-700 drop-shadow-lg">
+        Create a Ride!
+      </h2>
 
-      <form className="flex flex-col gap-6 w-full max-w-md p-6 bg-white rounded-lg shadow-lg border border-blue-500" onSubmit={handleCreateRide}>
-      {error && <p className="text-red-500 font-semibold">{error}</p>} {/* Utilizing the error state */}
+      <form
+        className="flex flex-col gap-6 w-full max-w-md p-6 bg-white rounded-lg shadow-lg border border-blue-500"
+        onSubmit={handleCreateRide}
+      >
+        {error && (
+          <p className="text-red-500 font-semibold">{error}</p> // Render error only when present
+        )}
 
         <div className="flex flex-col">
-          <label className="text-blue-600 font-medium" htmlFor="rideName">🎈 Ride Name</label>
+          <label className="text-blue-600 font-medium" htmlFor="rideName">
+            🎈 Ride Name
+          </label>
           <input
             id="rideName"
             type="text"
@@ -75,7 +83,9 @@ export default function CreateRide() {
         </div>
 
         <div className="flex flex-col">
-          <label className="text-blue-600 font-medium" htmlFor="rideDate">📅 Ride Date</label>
+          <label className="text-blue-600 font-medium" htmlFor="rideDate">
+            📅 Ride Date
+          </label>
           <input
             id="rideDate"
             type="date"
@@ -86,7 +96,9 @@ export default function CreateRide() {
         </div>
 
         <div className="flex flex-col">
-          <label className="text-blue-600 font-medium" htmlFor="fareInEthers">💰 Fare in Ethers</label>
+          <label className="text-blue-600 font-medium" htmlFor="fareInEthers">
+            💰 Fare in Ethers
+          </label>
           <input
             id="fareInEthers"
             type="number"
@@ -98,7 +110,9 @@ export default function CreateRide() {
         </div>
 
         <div className="flex flex-col">
-          <label className="text-blue-600 font-medium" htmlFor="numPassengers">👥 Number of Passengers</label>
+          <label className="text-blue-600 font-medium" htmlFor="numPassengers">
+            👥 Number of Passengers
+          </label>
           <input
             id="numPassengers"
             type="number"
@@ -117,7 +131,7 @@ export default function CreateRide() {
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200 transform hover:scale-105"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Creating..." : " Create Ride"}
+          {isSubmitting ? "Creating..." : "Create Ride"}
         </button>
       </form>
     </div>
