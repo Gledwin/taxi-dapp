@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useDisclosure } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -27,7 +25,7 @@ const NavBar = () => {
       setIsMiniPay(true);
       connect({ connector: injected({ target: "metaMask" }) });
     }
-  }, []);
+  }, [connect]); // Include connect in the dependency array
 
   return (
     <nav className="bg-blue-600 sticky top-0 z-50 px-4">
