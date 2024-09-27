@@ -20,41 +20,41 @@ export default function Home() {
   const { address, isConnected } = useAccount();
   const [taxiUser, setTaxiUser] = useState<TaxiUser | null>(null);
   const [rides, setRides] = useState<Ride[]>([]);
+  const [message, setMessage] = useState<string | null>(null); 
   const [payments, setPayments] = useState<Payment[]>([]);
   const router = useRouter();
 
+ 
   useEffect(() => {
     const initializeUser = async () => {
       if (isConnected && address) {
         try {
           setIsLoading(true);
-  
+
           const doesUserExist = await checkIfUserExists(address);
           setUserExists(doesUserExist);
-  
+
           if (doesUserExist) {
             const fetchedTaxiUser = await getUserByWalletAddress(address, {
               _walletAddress: address as `0x${string}`,
             });
-  
-            // Check if fetchedTaxiUser is not null before accessing its properties
+
             if (fetchedTaxiUser) {
               setTaxiUser(fetchedTaxiUser);
-  
+
               if (fetchedTaxiUser.isDriver) {
-                // Fetch rides specifically created by the driver
                 const driverRides = await getDriverRides(address);
                 setRides(driverRides);
               }
             }
-            
+
             const allPayments = await getAllPayments();
             const userPayments = allPayments.filter(
               (payment) => payment.passengerWalletAddress === address
             );
             setPayments(userPayments);
           }
-  
+
           setIsLoading(false);
         } catch (error) {
           console.error("Error checking user existence or fetching data:", error);
@@ -64,42 +64,51 @@ export default function Home() {
         setIsLoading(false);
       }
     };
-  
+
     initializeUser();
   }, [address, isConnected]);
-  
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 5000); // Hide message after 5 seconds
+
+      return () => clearTimeout(timer); // Cleanup timeout on unmount or message change
+    }
+  }, [message]);
+
 
   const handlePayForRide = async (rideId: number) => {
     const ride = rides.find((ride) => ride.id === rideId);
-  
+
     if (ride) {
       const fareAmount = BigInt(ride.fareInEthers);
-  
+
       if (fareAmount !== undefined) {
         try {
           const success = await payForRide(address as `0x${string}`, {
             _rideId: rideId,
             fareAmount: fareAmount,
           });
-  
+
           if (success) {
-            alert(`Payment for ride ${rideId} successful!`);
+            setMessage(`Payment for ride ${rideId} successful!`);
           } else {
-            alert(`Payment for ride ${rideId} failed.`);
+            setMessage(`Payment for ride ${rideId} failed.`);
           }
         } catch (error) {
           console.error("Payment failed due to an error:", error);
-          alert(`Payment for ride ${rideId} encountered an error.`);
+          setMessage(`Payment for ride ${rideId} encountered an error.`);
         }
       } else {
-        alert("Fare amount not found.");
+        setMessage("Fare amount not found.");
       }
     } else {
-      alert("Ride not found.");
+      setMessage("Ride not found.");
     }
   };
-  
-  // handleCompleteRide function for drivers
+
   const handleCompleteRide = async (rideId: number) => {
     try {
       const success = await completeRide(address as `0x${string}`, {
@@ -107,20 +116,19 @@ export default function Home() {
       });
 
       if (success) {
-        alert(`Ride ${rideId} marked as complete!`);
+        setMessage(`Ride ${rideId} marked as complete!`);
 
-        // Update the ride status in the front-end state
         setRides((prevRides) =>
           prevRides.map((ride) =>
             ride.id === rideId ? { ...ride, isCompleted: true } : ride
           )
         );
       } else {
-        alert(`Failed to mark ride ${rideId} as complete.`);
+        setMessage(`Failed to mark ride ${rideId} as complete.`);
       }
     } catch (error) {
       console.error("Error completing ride:", error);
-      alert(`Error completing ride ${rideId}.`);
+      setMessage(`Error completing ride ${rideId}.`);
     }
   };
 
@@ -155,9 +163,24 @@ export default function Home() {
             Welcome, {taxiUser?.username || "Valued User"}!
           </h4>
 
+         
+
+
           {!taxiUser?.isDriver ? (
+            
             // Passenger view
             <div className="mt-6 flex flex-col gap-6 items-center">
+
+            {/* Notification Banner */}
+{message && (
+  <div
+    className={`fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 shadow-lg transform transition duration-500 ease-in-out animate-bounce`}
+    style={{ fontFamily: 'Comic Sans MS, cursive', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)' }}
+  >
+    {message}
+  </div>
+)}
+
               <p className="text-gray-300 text-center">
                 Enjoy seamless cashless rides! Book your journey easily, knowing your payments are secure.
               </p>
@@ -213,8 +236,9 @@ export default function Home() {
                           <strong>Amount Paid:</strong> {payment.amountPaidInEthers} ETH
                         </p>
                         <p>
-                          <strong>Paid At:</strong> {new Date(payment.paidAt).toLocaleString()}
+                          <strong>Paid At:</strong> {new Date(payment.paidAt * 1000).toLocaleString()}
                         </p>
+                       
                       </li>
                     ))}
                   </ul>
@@ -227,6 +251,15 @@ export default function Home() {
           ) : (
             // Driver view
             <div className="mt-6 flex flex-col gap-6 items-center">
+
+{message && (
+  <div
+    className={`fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 shadow-lg transform transition duration-500 ease-in-out animate-bounce`}
+    style={{ fontFamily: 'Comic Sans MS, cursive', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)' }}
+  >
+    {message}
+  </div>
+)}
               <p className="text-gray-300 text-center">
                 As a driver, you play a vital role in our community! Create rides effortlessly and provide passengers with seamless, cashless journeys.
               </p>
@@ -261,7 +294,10 @@ export default function Home() {
                             <strong>Fare:</strong> {ride.fareInEthers} ETH
                           </p>
                           <p>
-                            <strong>Passengers:</strong> {ride.numPassengers}
+                            <strong>Passengers in arrear:</strong> {ride.numPassengers}
+                          </p>
+                          <p>
+                            <strong>Created At:</strong> {new Date(ride.createdAt * 1000).toLocaleDateString()}
                           </p>
                         </div>
                         {!ride.isCompleted && (

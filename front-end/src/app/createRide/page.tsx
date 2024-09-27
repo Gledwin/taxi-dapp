@@ -10,20 +10,20 @@ export default function CreateRide() {
   const [fareInEthers, setFareInEthers] = useState(0);
   const [numPassengers, setNumPassengers] = useState(1);
   const [totalFare, setTotalFare] = useState(0);
+  const [message, setMessage] = useState<string | null>(null); 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null); // Define as string or null
   const router = useRouter();
 
   const handleCreateRide = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!rideName || !rideDate || fareInEthers <= 0 || numPassengers <= 0) {
-      setError("Please provide a name, date, fare, and number of passengers for the ride.");
+      setMessage("Please provide a name, date, fare, and number of passengers for the ride.");
       return;
     }
 
     setIsSubmitting(true);
-    setError(null); // Reset error before making the request
+    setMessage(null); // Reset error before making the request
 
     try {
       const newRide = await createNewRide({
@@ -34,11 +34,11 @@ export default function CreateRide() {
       });
 
       if (newRide) {
-        alert("Ride successfully created!");
+        setMessage("Ride successfully created!");
         router.push("/");
       }
     } catch (err) {
-      setError("Failed to create ride. Please try again.");
+      setMessage("Failed to create ride. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -64,8 +64,8 @@ export default function CreateRide() {
         className="flex flex-col gap-6 w-full max-w-md p-6 bg-white rounded-lg shadow-lg border border-blue-500"
         onSubmit={handleCreateRide}
       >
-        {error && (
-          <p className="text-red-500 font-semibold">{error}</p> // Render error only when present
+        {message && (
+          <p className="text-red-500 font-semibold">{message}</p> // Render error only when present
         )}
 
         <div className="flex flex-col">

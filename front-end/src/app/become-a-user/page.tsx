@@ -18,6 +18,8 @@ export default function BecomeAUser() {
   const [usernameInput, setUsernameInput] = useState("");
   const [emailAddressInput, setEmailAddressInput] = useState("");
   const [roleInput, setRoleInput] = useState("");
+  const [message, setMessage] = useState<string | null>(null); 
+
 
   // Error states for validation
   const [usernameError, setUsernameError] = useState<string | null>(null);
@@ -41,6 +43,17 @@ export default function BecomeAUser() {
       setUsernameError(null); // Clear the error if validation passes
     }
   };
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 5000); // Hide message after 5 seconds
+
+      return () => clearTimeout(timer); // Cleanup timeout on unmount or message change
+    }
+  }, [message]);
+
 
   const handleEmailAddressInputChange = (e: { target: { value: string } }) => {
     setEmailAddressInput(e.target.value);
@@ -92,7 +105,8 @@ export default function BecomeAUser() {
       });
   
       if (isUserCreated) {
-        router.push("/"); // Navigate to home page with the role query
+        setMessage("User creation successful.");
+
         setUsernameInput("");
         setEmailAddressInput("");
         setRoleInput("");
@@ -100,7 +114,7 @@ export default function BecomeAUser() {
         setIsGettingStarted(false); // Hide the form after successful user creation
       } else {
         // You can show a general error message if user creation fails
-        alert("User creation failed. Please try again.");
+        setMessage("User creation failed. Please try again.");
       }
   
       setIsCreatingUser(false);
@@ -109,6 +123,14 @@ export default function BecomeAUser() {
   
   return (
     <main className="flex h-screen flex-col items-center">
+      {message && (
+  <div
+    className={`fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 shadow-lg transform transition duration-500 ease-in-out animate-bounce`}
+    style={{ fontFamily: 'Comic Sans MS, cursive', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)' }}
+  >
+    {message}
+  </div>
+)}
       <h3 className="font-normal text-lg py-8">Welcome to the Cashless Taxi System</h3>
 
       {userExists ? (

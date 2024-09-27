@@ -23,7 +23,7 @@ const NavBar = () => {
       (window.ethereum.isMiniPay || window.ethereum.isMinipay)
     ) {
       setIsMiniPay(true);
-      connect({ connector: injected({ target: "metaMask" }) });
+      connect({ connector: injected({}) });
     }
   }, [connect]); // Include connect in the dependency array
 
