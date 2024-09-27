@@ -5,7 +5,7 @@ import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 import { Ride } from "@/entities/taxiRide"; // Assuming you have an entity for Ride
 
 export const getDriverRides = async (driverAddress: string): Promise<Ride[]> => {
-  let driverRides: Ride[] = [];
+  const driverRides: Ride[] = []; // Changed to const
   if (window.ethereum) {
     const publicClient = createPublicClient({
       chain: celoAlfajores,
@@ -17,7 +17,7 @@ export const getDriverRides = async (driverAddress: string): Promise<Ride[]> => 
         abi: taxiContractABI,
         functionName: "getDriverRides", // Use the correct function from Solidity contract
         args: [driverAddress], // Pass the driver's wallet address as an argument
-      }) as Array<any>;
+      }) as Ride[]; // Specify the type as Ride[]
 
       for (let rideId = 0; rideId < fetchedRides.length; rideId++) {
         const rideToBeParsed = fetchedRides[rideId];

@@ -5,7 +5,7 @@ import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 import { Ride } from "@/entities/taxiRide"; // Assuming you have an entity for Ride
 
 export const getAllRides = async (): Promise<Ride[]> => {
-  let allRides: Ride[] = [];
+  const allRides: Ride[] = []; // Changed to const
   if (window.ethereum) {
     const publicClient = createPublicClient({
       chain: celoAlfajores,
@@ -16,7 +16,7 @@ export const getAllRides = async (): Promise<Ride[]> => {
         address: taxiContractAddress,
         abi: taxiContractABI,
         functionName: "getAllRides", // Assuming this is the correct function name in the Solidity contract
-      }) as Array<any>;
+      }) as Ride[]; // Specify the type as Ride[]
 
       for (let rideId = 0; rideId < fetchedRides.length; rideId++) {
         const rideToBeParsed = fetchedRides[rideId];
@@ -32,7 +32,7 @@ export const getAllRides = async (): Promise<Ride[]> => {
           isCompleted: rideToBeParsed["isCompleted"],
           isBlank: false,
           numPassengers: Number(rideToBeParsed["numPassengers"]),
-          totalFare: Number(rideToBeParsed["totalFare"])
+          totalFare: Number(rideToBeParsed["totalFare"]),
         };
         allRides.push(ride);
       }

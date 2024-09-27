@@ -1,6 +1,5 @@
-import { createPublicClient, createWalletClient, custom, http } from "viem";
+import { createPublicClient, custom } from "viem";
 import { celoAlfajores } from "viem/chains";
-import { privateKeyToAccount } from "viem/accounts";
 import { taxiContractABI } from "@/utils/abis/taxiContractABI";
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 
@@ -25,7 +24,7 @@ export const checkIfUserExists = async (
         console.error(err);
         return false;
       }
-    } catch (error) {
+    } catch {
       return false;
     }
   }

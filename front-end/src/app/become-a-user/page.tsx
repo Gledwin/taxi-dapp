@@ -5,14 +5,13 @@ import { createUser } from "@/services/createUser";
 import { useAccount } from "wagmi";
 import { checkIfUserExists } from "@/services/checkIfUserExists";
 import { useRouter } from "next/navigation";
-import { FiCheckCircle, FiXCircle } from "react-icons/fi"; // Icons for success and error
 import { TaxiUser } from "@/entities/taxiUser";
 
 export default function BecomeAUser() {
   const router = useRouter();
   const { address } = useAccount();
 
-  const [taxiUser, setTaxiUser] = useState<TaxiUser | null>(null);
+  const [taxiUser] = useState<TaxiUser | null>(null);
   const [isGettingStarted, setIsGettingStarted] = useState(false);
   const [userExists, setUserExists] = useState(false);
   const [isCreatingUser, setIsCreatingUser] = useState(false);

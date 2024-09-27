@@ -5,7 +5,6 @@ import { ThemeProvider } from "./providers";
 
 import {
   RainbowKitProvider,
-  connectorsForWallets,
   getDefaultConfig,
   lightTheme,
 } from "@rainbow-me/rainbowkit";

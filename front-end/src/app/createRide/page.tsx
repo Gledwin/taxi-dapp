@@ -6,7 +6,6 @@ import { createNewRide } from "@/services/createNewRide";
 import { useRouter } from "next/navigation";
 
 export default function CreateRide() {
-  const { address } = useAccount();
   const [rideName, setRideName] = useState("");
   const [rideDate, setRideDate] = useState("");
   const [fareInEthers, setFareInEthers] = useState(0);

@@ -1,4 +1,4 @@
-export const cUSDAlfajoresContractABI: Object[] = [
+export const cUSDAlfajoresContractABI: object[] = [
     {
         constant: true,
         inputs: [],
@@ -220,4 +220,3 @@ export const cUSDAlfajoresContractABI: Object[] = [
         type: "event",
     },
 ];
-

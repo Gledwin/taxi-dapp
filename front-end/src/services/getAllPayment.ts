@@ -5,7 +5,7 @@ import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 import { Payment } from "@/entities/payments";
 
 export const getAllPayments = async (): Promise<Payment[]> => {
-  let allPayments: Payment[] = [];
+  const allPayments: Payment[] = []; // Changed to const
   if (window.ethereum) {
     const publicClient = createPublicClient({
       chain: celoAlfajores,
@@ -16,7 +16,7 @@ export const getAllPayments = async (): Promise<Payment[]> => {
         address: taxiContractAddress,
         abi: taxiContractABI,
         functionName: "getAllPayments", // Ensure this matches the contract function
-      }) as Array<any>;
+      }) as Payment[]; // Specify type as Payment[]
 
       for (let paymentId = 0; paymentId < fetchedPayments.length; paymentId++) {
         const paymentToBeParsed = fetchedPayments[paymentId];
