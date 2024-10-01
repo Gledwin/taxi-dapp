@@ -97,7 +97,7 @@ export default function CreateRide() {
 
         <div className="flex flex-col">
           <label className="text-blue-600 font-medium" htmlFor="fareInEthers">
-            💰 Fare in Ethers
+            💰 Fare
           </label>
           <input
             id="fareInEthers"
@@ -124,7 +124,7 @@ export default function CreateRide() {
           />
         </div>
 
-        <p className="text-blue-600 font-bold"> Total Fare: {totalFare} ethers</p>
+        <p className="text-blue-600 font-bold"> Total Fare: {totalFare} cUSD</p>
 
         <button
           type="submit"
