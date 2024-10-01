@@ -12,7 +12,7 @@ import { Payment } from "@/entities/payments";
 import { useRouter } from "next/navigation";
 import { payForRide } from "@/services/payForRide";
 import { completeRide } from "@/services/completeRide";
-import { getDriverRides } from "@/services/getDriverRides";
+import { getDriverRides } from "@/services/getDriverRides"; // Import getDriverRides service
 
 export default function Home() {
   const [userExists, setUserExists] = useState(false);
@@ -24,6 +24,7 @@ export default function Home() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const router = useRouter();
 
+ 
   useEffect(() => {
     const initializeUser = async () => {
       if (isConnected && address) {
@@ -73,9 +74,10 @@ export default function Home() {
         setMessage(null);
       }, 5000); 
 
-      return () => clearTimeout(timer); 
+      return () => clearTimeout(timer); // Cleanup timeout on unmount or message change
     }
   }, [message]);
+
 
   const handlePayForRide = async (rideId: number) => {
     const ride = rides.find((ride) => ride.id === rideId);
@@ -161,59 +163,64 @@ export default function Home() {
             Welcome, {taxiUser?.username || "Valued User"}!
           </h4>
 
+         
+
+
           {!taxiUser?.isDriver ? (
+            
+            // Passenger view
             <div className="mt-6 flex flex-col gap-6 items-center">
-              {message && (
-                <div
-                  className={`fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 shadow-lg transform transition duration-500 ease-in-out animate-bounce`}
-                  style={{ fontFamily: 'Comic Sans MS, cursive', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)' }}
-                >
-                  {message}
-                </div>
-              )}
 
-              <p className="text-gray-300 text-center">
-                Enjoy seamless cashless rides! Book your journey easily, knowing your payments are secure.
-              </p>
+            {/* Notification Banner */}
+{message && (
+  <div
+    className={`fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 shadow-lg transform transition duration-500 ease-in-out animate-bounce`}
+    style={{ fontFamily: 'Comic Sans MS, cursive', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)' }}
+  >
+    {message}
+  </div>
+)}
 
-              <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
-                <h5 className="text-black font-bold mb-2">Available Rides</h5>
-                {rides.length > 0 ? (
-                  <ul className="space-y-4">
-                    {rides.map((ride) => (
-                      <li
-                        key={ride.id}
-                        className={`bg-gray-200 p-4 rounded-lg shadow-md ${
-                          ride.isCompleted ? "opacity-50" : ""
-                        }`}
-                      >
-                        <p>
-                          <strong>Destination:</strong> {ride.destination}
-                        </p>
-                        <p>
-                          <strong>Fare per Passenger:</strong> {ride.fareInEthers} cUSD
-                        </p>
-                        <p>
-                          <strong>Passengers:</strong> {ride.numPassengers}
-                        </p>
-                        {ride.isCompleted ? (
-                          <span className="text-green-500 font-bold">Completed</span>
-                        ) : (
-                          <button
-                            className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
-                            onClick={() => handlePayForRide(ride.id)}
-                          >
-                            Pay for Ride
-                          </button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No rides available.</p>
-                )}
-              </div>
+<div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+  <h5 className="text-black font-bold mb-2">Available Rides</h5>
+  {rides.length > 0 ? (
+    <ul className="space-y-4">
+      {rides.map((ride) => (
+        <li
+          key={ride.id}
+          className={`bg-gray-200 p-4 rounded-lg shadow-md ${
+            ride.isCompleted ? "opacity-50" : ""
+          }`}
+        >
+          <p>
+            <strong>Destination:</strong> {ride.destination}
+          </p>
+          <p>
+            <strong>Fare per Passenger:</strong> {ride.fareInEthers} cUSD
+          </p>
+          <p>
+            <strong>Passengers:</strong> {ride.numPassengers}
+          </p>
+          {ride.isCompleted ? (
+            <span className="text-green-500 font-bold">Completed</span>
+          ) : (
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
+              onClick={() => handlePayForRide(ride.id)} 
+            >
+              Pay for Ride
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No rides available.</p>
+  )}
+</div>
 
+
+              {/* Display the list of payments for passengers */}
               <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
                 <h5 className="text-black font-bold mb-2">Your Payments</h5>
                 {payments.length > 0 ? (
@@ -232,6 +239,7 @@ export default function Home() {
                         <p>
                           <strong>Paid At:</strong> {new Date(payment.paidAt * 1000).toLocaleString()}
                         </p>
+                       
                       </li>
                     ))}
                   </ul>
@@ -239,47 +247,63 @@ export default function Home() {
                   <p>No payments found.</p>
                 )}
               </div>
+
             </div>
           ) : (
+            // Driver view
             <div className="mt-6 flex flex-col gap-6 items-center">
-              {message && (
-                <div
-                  className={`fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 shadow-lg transform transition duration-500 ease-in-out animate-bounce`}
-                  style={{ fontFamily: 'Comic Sans MS, cursive', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)' }}
-                >
-                  {message}
-                </div>
-              )}
 
+{message && (
+  <div
+    className={`fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 shadow-lg transform transition duration-500 ease-in-out animate-bounce`}
+    style={{ fontFamily: 'Comic Sans MS, cursive', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)' }}
+  >
+    {message}
+  </div>
+)}
               <p className="text-gray-300 text-center">
-                You’re a driver. Manage your rides easily and ensure passengers are safely transported.
+                As a driver, you play a vital role in our community! Create rides effortlessly and provide passengers with seamless, cashless journeys.
               </p>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 transition-transform transform hover:scale-105"
+                onClick={() => router.push("/createRide")}
+              >
+                Create a Ride
+              </button>
 
-              <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
-                <h5 className="text-black font-bold mb-2">Your Rides</h5>
+              <div className="mt-6 bg-gray-700 p-6 rounded-lg shadow-md w-full max-w-xl">
+                <h5 className="text-white font-bold mb-4 text-xl text-center">
+                  Manage Your Rides 🚕
+                </h5>
                 {rides.length > 0 ? (
-                  <ul className="space-y-4">
+                  <ul className="bg-gray-800 p-4 rounded-lg shadow-md divide-y divide-gray-600">
                     {rides.map((ride) => (
                       <li
                         key={ride.id}
-                        className={`bg-gray-200 p-4 rounded-lg shadow-md ${
-                          ride.isCompleted ? "opacity-50" : ""
+                        className={`py-4 px-4 rounded-lg mb-2 transition hover:bg-gray-600 flex justify-between items-center ${
+                          ride.isCompleted ? "bg-green-500" : "bg-gray-700"
                         }`}
                       >
-                        <p>
-                          <strong>Destination:</strong> {ride.destination}
-                        </p>
-                        <p>
-                          <strong>Fare per Passenger:</strong> {ride.fareInEthers} cUSD
-                        </p>
-                        <p>
-                          <strong>Passengers:</strong> {ride.numPassengers}
-                        </p>
-                        {ride.isCompleted ? (
-                          <span className="text-green-500 font-bold">Completed</span>
-                        ) : (
+                        <div>
+                          <p>
+                            <strong>Ride ID:</strong> {ride.id}
+                          </p>
+                          <p>
+                            <strong>Destination:</strong> {ride.destination}
+                          </p>
+                          <p>
+                            <strong>Fare:</strong> {ride.fareInEthers} cUSD
+                          </p>
+                          <p>
+                            <strong>Passengers in arrear:</strong> {ride.numPassengers}
+                          </p>
+                          <p>
+                            <strong>Created At:</strong> {new Date(ride.createdAt * 1000).toLocaleDateString()}
+                          </p>
+                        </div>
+                        {!ride.isCompleted && (
                           <button
-                            className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
+                            className="bg-green-600 text-white px-4 py-1 rounded mt-2"
                             onClick={() => handleCompleteRide(ride.id)}
                           >
                             Complete Ride
@@ -289,7 +313,7 @@ export default function Home() {
                     ))}
                   </ul>
                 ) : (
-                  <p>No rides available.</p>
+                  <p className="text-white">No rides available.</p>
                 )}
               </div>
             </div>
