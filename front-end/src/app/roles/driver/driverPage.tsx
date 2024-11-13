@@ -10,7 +10,6 @@ import { getBalance } from "@/services/getBalance";
 import { getAllPaymentsByRideId } from "@/services/getPaymentsByRide";
 import { Payment } from "@/entities/payments";
 import { getUserByWalletAddress } from "@/services/getUserByWalletAddress";
-import FunSpinner from "@/components/spinner";
 
 interface DriverPageProps {
   address: `0x${string}`;
@@ -34,11 +33,12 @@ export default function DriverPage({
   const router = useRouter();
   const [balance, setBalance] = useState("0.00");
   const [ridePayments, setRidePayments] = useState<Record<string, PaymentWithUser[]>>({});
-  const [isLoading, setIsLoading] = useState(true);
 
   const incompleteRides = rides.filter((ride) => !ride.isCompleted);
 
   useEffect(() => {
+    console.log("Driver's address in DriverPage:", address); // Debugging line for address
+
     const fetchBalance = async () => {
       try {
         const balance = await getBalance(address);
@@ -47,7 +47,10 @@ export default function DriverPage({
         console.error("Error fetching balance:", error);
       }
     };
+    fetchBalance();
+  }, [address]);
 
+  useEffect(() => {
     const fetchPaymentsForRides = async () => {
       const paymentsData: Record<string, PaymentWithUser[]> = {};
 
@@ -77,16 +80,8 @@ export default function DriverPage({
       setRidePayments(paymentsData);
     };
 
-    const initializeData = async () => {
-      await fetchBalance();
-      await fetchPaymentsForRides();
-      setIsLoading(false);
-    };
-
     if (incompleteRides.length > 0) {
-      initializeData();
-    } else {
-      setIsLoading(false);
+      fetchPaymentsForRides();
     }
   }, [incompleteRides, address]);
 
@@ -98,23 +93,17 @@ export default function DriverPage({
           ? `Ride ${rideId} marked as complete!`
           : `Failed to mark ride ${rideId} as complete.`
       );
-
+  
       if (success) {
-        // Clear the message after 5 seconds and reload the page
-        setTimeout(() => {
-          setMessage(null);
-          window.location.reload();
-        }, 5000);
+        // Refresh the page to update the list of incomplete rides
+        router.refresh();
       }
     } catch (error) {
       console.error("Error completing ride:", error);
       setMessage(`Error completing ride ${rideId}.`);
     }
   };
-
-  if (isLoading) {
-    return <FunSpinner />;
-  }
+  
 
   return (
     <>
