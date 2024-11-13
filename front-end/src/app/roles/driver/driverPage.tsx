@@ -90,6 +90,10 @@ export default function DriverPage({
     }
   }, [incompleteRides, address]);
 
+  const handleNavigateToRideOverview = (rideId: number) => {
+    router.push(`/roles/driver/overview/${rideId}?address=${address}`);
+  };
+
   const handleCompleteRide = async (rideId: number) => {
     try {
       const success = await completeRide(address, { _rideId: rideId });
@@ -100,7 +104,6 @@ export default function DriverPage({
       );
 
       if (success) {
-        // Clear the message after 5 seconds and reload the page
         setTimeout(() => {
           setMessage(null);
           window.location.reload();
@@ -131,22 +134,11 @@ export default function DriverPage({
         )}
 
         <section className="flex flex-col md:flex-row items-center justify-around w-full max-w-4xl mt-6 space-y-4 md:space-y-0 md:space-x-6">
-          <div className="bg-gradient-to-r from-green-500 to-yellow-500 rounded-lg p-6 shadow-lg w-full md:w-1/3">
-            <h5 className="text-xl font-semibold mb-2">Current Balance</h5>
-            <p className="text-3xl font-bold">{balance} cUSD</p>
-          </div>
-
           <button
             className="w-full bg-gradient-to-r from-green-500 to-yellow-500 text-black font-bold px-6 py-3 rounded-lg shadow-lg hover:opacity-90 transition duration-200"
             onClick={() => router.push("/createRide")}
           >
             Create a Ride
-          </button>
-          <button
-            className="w-full bg-gradient-to-r from-green-500 to-yellow-500 text-black font-bold px-6 py-3 rounded-lg shadow-lg hover:opacity-90 transition duration-200"
-            onClick={() => router.push(`/roles/driver/completed?address=${address}`)}
-          >
-            Completed Rides
           </button>
         </section>
 
@@ -157,38 +149,12 @@ export default function DriverPage({
               {incompleteRides.map((ride) => (
                 <li key={ride.id.toString()} className="py-4 px-4 rounded-lg mb-2 bg-gradient-to-r from-yellow-500 to-green-500">
                   <p><strong>Destination:</strong> {ride.destination}</p>
-                  <p><strong>Driver's name:</strong> {ride.driverName}</p>
-                  <p><strong>License plate:</strong> {ride.licensePlate}</p>
-                  <p><strong>Fare:</strong> {ride.fareInEthers} cUSD</p>
-                  <p><strong>Number of passengers:</strong> {ride.numPassengers}</p>
-                  <p><strong>Expected amount:</strong> {ride.totalFare} cUSD</p>
-                  <p><strong>Created At:</strong>{" "}
-                    {new Date(Number(ride.createdAt) * 1000).toLocaleDateString()}
-                  </p>
-                  
                   <button
                     className="bg-green-600 text-white px-4 py-1 rounded mt-2 hover:bg-green-700"
-                    onClick={() => handleCompleteRide(ride.id)}
+                    onClick={() => handleNavigateToRideOverview(ride.id)}
                   >
-                    Complete Ride
+                    View Ride Overview
                   </button>
-                  <div className="mt-4">
-                    <h6 className="font-bold">Payments:</h6>
-                    {ridePayments[ride.id.toString()] && ridePayments[ride.id.toString()].length > 0 ? (
-                      <ul className="space-y-2 mt-2">
-                        {ridePayments[ride.id.toString()].map((payment) => (
-                          <li key={payment.id} className="text-sm">
-                            <strong>Passenger:</strong> {payment.username} <br />
-                            <strong>Address:</strong> {payment.passengerWalletAddress} <br />
-                            <strong>Amount Paid:</strong> {payment.amountPaidInEthers} cUSD <br />
-                            <strong>Paid At:</strong> {new Date(Number(payment.paidAt) * 1000).toLocaleString()}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-xs text-gray-200">No payments yet.</p>
-                    )}
-                  </div>
                 </li>
               ))}
             </ul>
