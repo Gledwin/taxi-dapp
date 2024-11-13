@@ -33,7 +33,9 @@ export const getDriverRides = async (driverAddress: string): Promise<Ride[]> => 
           isCompleted: rideToBeParsed["isCompleted"],
           isBlank: false,
           numPassengers: Number(rideToBeParsed["numPassengers"]),
-          totalFare: Number(rideToBeParsed["totalFare"])
+          totalFare: Number(rideToBeParsed["totalFare"]),
+          driverName: rideToBeParsed["driverName"],
+          licensePlate: rideToBeParsed["licensePlate"]
         };
         driverRides.push(ride);
       }

@@ -1,5 +1,6 @@
 
 export type Payment = {
+    passengerUsername: string;
     paidAt: number;
     id: number;
     rideId: number;

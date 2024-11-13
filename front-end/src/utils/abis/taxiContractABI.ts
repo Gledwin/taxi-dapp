@@ -34,6 +34,16 @@ export const taxiContractABI =
 				"internalType": "uint256",
 				"name": "_totalFare",
 				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_driverName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_licensePlate",
+				"type": "string"
 			}
 		],
 		"name": "createRide",
@@ -49,6 +59,16 @@ export const taxiContractABI =
 						"internalType": "address",
 						"name": "driverWalletAddress",
 						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "driverName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "licensePlate",
+						"type": "string"
 					},
 					{
 						"internalType": "string",
@@ -171,17 +191,17 @@ export const taxiContractABI =
 				"internalType": "uint256",
 				"name": "_rideId",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_numPeoplePayingFor",
+				"type": "uint256"
 			}
 		],
 		"name": "payForRide",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
-	},
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
 	},
 	{
 		"inputs": [
@@ -266,6 +286,62 @@ export const taxiContractABI =
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_rideId",
+				"type": "uint256"
+			}
+		],
+		"name": "getAllPaymentsByRideId",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "rideId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "passengerWalletAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountPaidInEthers",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "paidAt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isPaid",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isBlank",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct Payment[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "getAllRides",
 		"outputs": [
@@ -280,6 +356,16 @@ export const taxiContractABI =
 						"internalType": "address",
 						"name": "driverWalletAddress",
 						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "driverName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "licensePlate",
+						"type": "string"
 					},
 					{
 						"internalType": "string",
@@ -339,6 +425,25 @@ export const taxiContractABI =
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			}
+		],
+		"name": "getBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "_driverAddress",
 				"type": "address"
 			}
@@ -356,6 +461,16 @@ export const taxiContractABI =
 						"internalType": "address",
 						"name": "driverWalletAddress",
 						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "driverName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "licensePlate",
+						"type": "string"
 					},
 					{
 						"internalType": "string",
@@ -491,6 +606,16 @@ export const taxiContractABI =
 					},
 					{
 						"internalType": "string",
+						"name": "driverName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "licensePlate",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
 						"name": "destination",
 						"type": "string"
 					},
@@ -546,6 +671,25 @@ export const taxiContractABI =
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_rideId",
+				"type": "uint256"
+			}
+		],
+		"name": "getRidePayers",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "_walletAddress",
 				"type": "address"
@@ -589,6 +733,49 @@ export const taxiContractABI =
 				"internalType": "struct TaxiUser",
 				"name": "",
 				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "rideAmountPaid",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "ridePayments",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",

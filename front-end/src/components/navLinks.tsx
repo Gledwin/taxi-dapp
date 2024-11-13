@@ -1,23 +1,24 @@
 import { ReactNode } from 'react';
-import { Link } from '@chakra-ui/react';
+import { Link, LinkProps } from '@chakra-ui/react';
 
-interface NavLinkProps {
+interface NavLinkProps extends LinkProps {
   children: ReactNode;
   href: string;
 }
 
-const NavLink = ({ children, href }: NavLinkProps) => (
+const NavLink = ({ children, href, ...props }: NavLinkProps) => (
   <Link
     px={2}
     py={1}
-    rounded={"md"}
-    textColor={"white"}
+    rounded="md"
+    textColor="white"
     _hover={{
       textColor: "black",
       textDecoration: "none",
       bg: "white",
     }}
     href={href}
+    {...props} // Spread other props here, including className if needed
   >
     {children}
   </Link>

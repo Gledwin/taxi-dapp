@@ -7,10 +7,9 @@ import { cUSDAlfajoresContractAddress } from "@/utils/addresses/cUSDAlfajoresCon
 
 export const payForRide = async (
   _signerAddress: `0x${string}` | undefined,
-  { _rideId, fareAmount }: PayForRideProps
+  { _rideId, fareAmount, _numPeoplePayingFor }: PayForRideProps
 ): Promise<boolean> => {
   if (window.ethereum) {
-    // Create wallet and public clients
     const privateClient = createWalletClient({
       chain: celoAlfajores,
       transport: custom(window.ethereum),
@@ -23,37 +22,31 @@ export const payForRide = async (
     const [address] = await privateClient.getAddresses();
 
     try {
-      // Step 1: Approve cUSD transfer to the contract
       const approveTxnHash = await privateClient.writeContract({
         account: address,
-        address: cUSDAlfajoresContractAddress, // cUSD token contract address
-        abi: cUSDAlfajoresContractABI,         // cUSD token ABI
-        functionName: "approve",   // Approve cUSD transfer
-        args: [taxiContractAddress, fareAmount], // Approve contract to transfer fareAmount
+        address: cUSDAlfajoresContractAddress,
+        abi: cUSDAlfajoresContractABI,
+        functionName: "approve",
+        args: [taxiContractAddress, fareAmount],
       });
 
       await publicClient.waitForTransactionReceipt({
         hash: approveTxnHash,
       });
 
-      // Step 2: Trigger the payForRide function in the taxi contract
       const payForRideTxnHash = await privateClient.writeContract({
         account: address,
         address: taxiContractAddress,
         abi: taxiContractABI,
         functionName: "payForRide",
-        args: [_rideId],
+        args: [_rideId, _numPeoplePayingFor],
       });
 
-      // Wait for transaction receipt to confirm success
       const payForRideTxnReceipt = await publicClient.waitForTransactionReceipt({
         hash: payForRideTxnHash,
       });
 
-      if (payForRideTxnReceipt.status === "success") {
-        return true; // Payment succeeded
-      }
-      return false;
+      return payForRideTxnReceipt.status === "success";
     } catch (error) {
       console.error("Error paying for ride:", error);
       return false;
@@ -65,4 +58,5 @@ export const payForRide = async (
 type PayForRideProps = {
   _rideId: number;
   fareAmount: bigint;
-}
+  _numPeoplePayingFor: number;
+};

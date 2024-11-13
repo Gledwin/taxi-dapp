@@ -33,6 +33,8 @@ export const getAllRides = async (): Promise<Ride[]> => {
           isBlank: false,
           numPassengers: Number(rideToBeParsed["numPassengers"]),
           totalFare: Number(rideToBeParsed["totalFare"]),
+          driverName: rideToBeParsed["driverName"],
+          licensePlate: rideToBeParsed["licensePlate"]
         };
         allRides.push(ride);
       }

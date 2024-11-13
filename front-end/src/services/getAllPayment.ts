@@ -27,6 +27,7 @@ export const getAllPayments = async (): Promise<Payment[]> => {
           amountPaidInEthers: Number(paymentToBeParsed["amountPaidInEthers"]),
           paidAt: Number(paymentToBeParsed["paidAt"]),
           isBlank: false,
+          passengerUsername: ""
         };
         allPayments.push(payment);
       }

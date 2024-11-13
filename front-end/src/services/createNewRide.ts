@@ -13,6 +13,8 @@ export const createNewRide = async (
         _fareInEthers,
         _numPassengers,
         _totalFare,
+        _driverName,
+        _licensePlate
     }: CreateRideProps
 ): Promise<boolean> => {
     if (window.ethereum) {
@@ -32,13 +34,13 @@ export const createNewRide = async (
         const [address] = await privateClient.getAddresses();
 
         try {
-            // Call the `createRide` function from the smart contract
+            // Call the `createRide` function from the smart contract with the new arguments
             const createRideTxnHash = await privateClient.writeContract({
                 account: address,
                 address: taxiContractAddress,  // Smart contract address
                 abi: taxiContractABI,          // Smart contract ABI
                 functionName: "createRide",    // The function in the smart contract
-                args: [_destination, _fareInEthers, _numPassengers, _totalFare], // Function arguments as per contract
+                args: [_destination, _fareInEthers, _numPassengers, _totalFare, _driverName, _licensePlate], // Updated function arguments
             });
 
             // Wait for the transaction to be mined and retrieve the receipt
@@ -64,4 +66,6 @@ export type CreateRideProps = {
     _fareInEthers: number;
     _numPassengers: number;
     _totalFare: number;
+    _driverName: string;
+    _licensePlate: string;
 };
