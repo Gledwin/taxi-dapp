@@ -10,7 +10,7 @@ import { getUserByWalletAddress } from "@/services/getUserByWalletAddress";
 import { getRideById } from "@/services/getRideById";
 import { FaUser, FaCar, FaMapMarkerAlt, FaMoneyBill, FaCalendarAlt } from "react-icons/fa";
 
-interface RideOverviewProps {
+interface DriverPageProps {
   address: `0x${string}`;
 }
 
@@ -23,7 +23,7 @@ interface RideWithEarnings extends Ride {
   payments: PaymentWithUser[];
 }
 
-export default function RideOverview({ address }: RideOverviewProps) {
+export default function RideOverview({ address }: DriverPageProps) {
   const [rideWithEarnings, setRideWithEarnings] = useState<RideWithEarnings | null>(null);
   const { id: rideId } = useParams(); // Use useParams to get rideId
 
