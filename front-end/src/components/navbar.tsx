@@ -39,7 +39,7 @@ const NavBar = () => {
           {isOpen ? "✖" : "☰"}
         </button>
         <div className="flex items-center space-x-8">
-          <h3 className="text-white font-bold text-2xl px-4 py-2 shadow-md transition-transform duration-300 hover:scale-105">
+          <h3 className="text-green-800 font-bold text-2xl px-4 py-2 shadow-md transition-transform duration-300 hover:scale-105">
             C.T.S
           </h3>
           <div className={`hidden md:flex space-x-4`}>

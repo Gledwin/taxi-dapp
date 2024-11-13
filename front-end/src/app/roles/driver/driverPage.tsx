@@ -108,9 +108,9 @@ export default function DriverPage({
   return (
     <>
       <main className="flex flex-col items-center p-6 text-black shadow-lg min-h-screen">
-        <h4 className="text-3xl font-extrabold pt-6 pb-2">Driver Dashboard</h4>
-        <p className="text-lg">
-          Welcome, <span className="font-bold">{taxiUser?.username || "Driver"}</span>!
+        <h4 className="text-3xl text-green-800 font-extrabold pt-6 pb-2">Driver Dashboard</h4>
+        <p className="text-lg text-green-800">
+          Welcome, <span className="font-bold text-green-800">{taxiUser?.username || "Driver"}</span>!
         </p>
 
         {message && (

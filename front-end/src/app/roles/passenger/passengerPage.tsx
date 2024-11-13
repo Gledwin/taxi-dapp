@@ -130,9 +130,9 @@ export default function PassengerPage({
       )}
 
       <main className="flex flex-col items-center p-6 shadow-lg">
-        <h4 className="text-2xl font-bold pt-4 pb-2 text-black">Passenger Dashboard</h4>
-        <p className="text-lg">
-          Welcome, <span className="font-bold">{taxiUser?.username || "Guest"}</span>!
+        <h4 className="text-2xl font-bold pt-4 pb-2 text-green-800">Passenger Dashboard</h4>
+        <p className="text-lg text-green-800">
+          Welcome, <span className="font-bold text-green-800">{taxiUser?.username || "Guest"}</span>!
         </p>
 
         {message && (
@@ -143,8 +143,8 @@ export default function PassengerPage({
 
         {/* Balance Display */}
         <div className="bg-gradient-to-r from-green-500 to-yellow-500 text-white p-4 rounded-lg shadow-md w-full max-w-md mt-4 text-center">
-          <h5 className="text-lg font-bold">Current balance</h5>
-          <p className="text-xl font-semibold">{balance} cUSD</p>
+          <h5 className="text-lg font-bold text-black">Current balance</h5>
+          <p className="text-xl font-semibold text-black">{balance} cUSD</p>
         </div>
 
         {/* Rides List */}
