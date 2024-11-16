@@ -11,6 +11,16 @@ import { getAllPaymentsByRideId } from "@/services/getPaymentsByRide";
 import { Payment } from "@/entities/payments";
 import { getUserByWalletAddress } from "@/services/getUserByWalletAddress";
 
+import {
+  FaTaxi,
+  FaCheckCircle,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaUser,
+  FaWallet,
+  FaClock,
+} from "react-icons/fa";
+
 interface DriverPageProps {
   address: `0x${string}`;
   rides: Ride[];
@@ -33,12 +43,11 @@ export default function DriverPage({
   const router = useRouter();
   const [balance, setBalance] = useState("0.00");
   const [ridePayments, setRidePayments] = useState<Record<string, PaymentWithUser[]>>({});
+  const [loadingAction, setLoadingAction] = useState(false);
 
   const incompleteRides = rides.filter((ride) => !ride.isCompleted);
 
   useEffect(() => {
-    console.log("Driver's address in DriverPage:", address); // Debugging line for address
-
     const fetchBalance = async () => {
       try {
         const balance = await getBalance(address);
@@ -64,10 +73,9 @@ export default function DriverPage({
                 payment.passengerWalletAddress !== "0x0000000000000000000000000000000000000000"
             )
             .map(async (payment) => {
-              const taxiUser = await getUserByWalletAddress(
-                address,
-                { _walletAddress: payment.passengerWalletAddress }
-              );
+              const taxiUser = await getUserByWalletAddress(address, {
+                _walletAddress: payment.passengerWalletAddress,
+              });
               return {
                 ...payment,
                 username: taxiUser?.username || payment.passengerWalletAddress,
@@ -86,6 +94,7 @@ export default function DriverPage({
   }, [incompleteRides, address]);
 
   const handleCompleteRide = async (rideId: number) => {
+    setLoadingAction(true);
     try {
       const success = await completeRide(address, { _rideId: rideId });
       setMessage(
@@ -95,94 +104,148 @@ export default function DriverPage({
       );
   
       if (success) {
-        // Refresh the page to update the list of incomplete rides
-        router.refresh();
+        setTimeout(() => {
+          window.location.reload(); // Force a full-page reload
+        }, 5000);
       }
     } catch (error) {
       console.error("Error completing ride:", error);
       setMessage(`Error completing ride ${rideId}.`);
+    } finally {
+      setLoadingAction(false);
     }
   };
   
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message, setMessage]);
+
   return (
     <>
-      <main className="flex flex-col items-center p-6 text-black shadow-lg min-h-screen">
-        <h4 className="text-3xl text-green-800 font-extrabold pt-6 pb-2">Driver Dashboard</h4>
-        <p className="text-lg text-green-800">
-          Welcome, <span className="font-bold text-green-800">{taxiUser?.username || "Driver"}</span>!
-        </p>
+      {loadingAction && (
+        <div className="fixed inset-0 flex items-center justify-center bg-opacity-75 bg-gray-800 z-50">
+          <div className="text-center text-white text-lg font-bold">
+            Completing a ride...
+          </div>
+        </div>
+      )}
 
-        {message && (
-          <div className="fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-green-500 to-yellow-500 shadow-lg">
+     {message && (
+          <div className="fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-green-800 shadow-lg">
             {message}
           </div>
         )}
 
-        <section className="flex flex-col md:flex-row items-center justify-around w-full max-w-4xl mt-6 space-y-4 md:space-y-0 md:space-x-6">
-          <div className="bg-gradient-to-r from-green-500 to-yellow-500 rounded-lg p-6 shadow-lg w-full md:w-1/3">
-            <h5 className="text-xl font-semibold mb-2">Current Balance</h5>
-            <p className="text-3xl font-bold">{balance} cUSD</p>
-          </div>
+      <main className="flex flex-col items-center p-4 min-h-screen">
+        <div className="bg-green-800 w-full max-w-md p-8 rounded-3xl shadow-lg text-white mb-8">
+          <h4 className="text-3xl font-semibold mb-2 text-left">
+            Hi, {taxiUser?.username || "Driver"}
+          </h4>
+          <p className="text-left text-gray-400">Your Current Balance</p>
+          <p className="text-left text-5xl font-bold mt-4 mb-6">{balance} celo</p>
+        </div>
+        <div className="w-full max-w-md mb-6 flex justify-around text-white gap-4">
+  <button
+    onClick={() => router.push("/createRide")}
+    className="bg-green-800 rounded-3xl flex-1 p-4 flex flex-col items-center shadow-md hover:bg-green-500 transition"
+    style={{ height: "80px" }} 
+  >
+    <FaTaxi size={24} />
+    <span className="text-sm font-semibold mt-2">Create a Ride</span>
+  </button>
+  <button
+    onClick={() => router.push(`/roles/driver/completed?address=${address}`)}
+    className="bg-green-800 rounded-3xl flex-1 p-4 flex flex-col items-center shadow-md hover:bg-green-500 transition"
+    style={{ height: "80px" }} 
+  >
+    <FaCheckCircle size={32} />
+    <span className="text-sm font-semibold mt-2">Completed Rides</span>
+  </button>
+</div>
 
-          <button
-            className="w-full bg-gradient-to-r from-green-500 to-yellow-500 text-black font-bold px-6 py-3 rounded-lg shadow-lg hover:opacity-90 transition duration-200"
-            onClick={() => router.push("/createRide")}
-          >
-            Create a Ride
-          </button>
-          <button
-            className="w-full bg-gradient-to-r from-green-500 to-yellow-500 text-black font-bold px-6 py-3 rounded-lg shadow-lg hover:opacity-90 transition duration-200"
-            onClick={() => router.push(`/roles/driver/completed?address=${address}`)}
-          >
-            Completed Rides
-          </button>
-        </section>
 
-        <div className="mt-8 bg-gradient-to-r from-green-500 to-yellow-500 p-6 rounded-lg shadow-md w-full max-w-4xl">
-          <h5 className="text-2xl font-bold mb-4 text-center">Current Rides 🚕</h5>
+        <div className="w-full max-w-md space-y-4">
+          <h5 className="text-2xl font-semibold text-green-800 mb-2">Current Rides</h5>
+
           {incompleteRides.length > 0 ? (
-            <ul className="divide-y divide-gray-600">
+            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {incompleteRides.map((ride) => (
-                <li key={ride.id.toString()} className="py-4 px-4 rounded-lg mb-2 bg-gradient-to-r from-yellow-500 to-green-500">
-                  <p><strong>Destination:</strong> {ride.destination}</p>
-                  <p><strong>Driver's name:</strong> {ride.driverName}</p>
-                  <p><strong>License plate:</strong> {ride.licensePlate}</p>
-                  <p><strong>Fare:</strong> {ride.fareInEthers} cUSD</p>
-                  <p><strong>Number of passengers:</strong> {ride.numPassengers}</p>
-                  <p><strong>Expected amount:</strong> {ride.totalFare} cUSD</p>
-                  <p><strong>Created At:</strong>{" "}
-                    {new Date(Number(ride.createdAt) * 1000).toLocaleDateString()}
-                  </p>
-                  
+                <li
+                  key={ride.id.toString()}
+                  className="bg-green-800 rounded-3xl p-6 shadow-lg text-white"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold flex items-center gap-2">
+                      <FaMapMarkerAlt className="text-white" /> {ride.destination}
+                    </h3>
+                    <span className="text-xs bg-yellow-500 px-3 py-1 rounded-full">
+                      ID: {ride.id}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-gray-300 mb-4">
+                    <p className="flex items-center gap-2">
+                      <FaMoneyBillWave className="text-white" />
+                      Fare: <span className="text-white">{ride.fareInEthers} cUSD</span>
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <FaUser className="text-white" />
+                      Passengers:{" "}
+                      <span className="text-white">
+                        {ride.numPassengers} {ride.numPassengers > 1 ? "Passengers" : "Passenger"}
+                      </span>
+                    </p>
+                  </div>
+
                   <button
-                    className="bg-green-600 text-white px-4 py-1 rounded mt-2 hover:bg-green-700"
                     onClick={() => handleCompleteRide(ride.id)}
+                    className="w-full py-2 text-sm font-semibold bg-yellow-500 rounded-lg hover:bg-blue-700 transition"
                   >
-                    Complete Ride
+                    Mark as Complete
                   </button>
-                  <div className="mt-4">
-                    <h6 className="font-bold">Payments:</h6>
-                    {ridePayments[ride.id.toString()] && ridePayments[ride.id.toString()].length > 0 ? (
-                      <ul className="space-y-2 mt-2">
+
+                  <div className="mt-6 ">
+                    <h4 className="font-bold text-gray-200 mb-2">Payments</h4>
+                    {ridePayments[ride.id.toString()] &&
+                    ridePayments[ride.id.toString()].length > 0 ? (
+                      <div className="space-y-4">
                         {ridePayments[ride.id.toString()].map((payment) => (
-                          <li key={payment.id} className="text-sm">
-                            <strong>Passenger:</strong> {payment.username} <br />
-                            <strong>Address:</strong> {payment.passengerWalletAddress} <br />
-                            <strong>Amount Paid:</strong> {payment.amountPaidInEthers} cUSD <br />
-                            <strong>Paid At:</strong> {new Date(Number(payment.paidAt) * 1000).toLocaleString()}
-                          </li>
+                          <div
+                            key={payment.id}
+                            className="bg-green-800 p-4 rounded-lg shadow-md"
+                          >
+                            <div className="flex justify-between items-center mb-2">
+                              <p className="font-bold text-white flex items-center gap-2">
+                                <FaWallet /> {payment.username}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                <FaClock className="inline-block mr-1" />
+                                {new Date(Number(payment.paidAt) * 1000).toLocaleString()}
+                              </p>
+                            </div>
+                            <p>
+                              <strong className="text-gray-300">Paid:</strong>{" "}
+                              <span className="text-green-400">{payment.amountPaidInEthers} cUSD</span>
+                            </p>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     ) : (
-                      <p className="text-xs text-gray-200">No payments yet.</p>
+                      <p className="text-sm text-gray-400">No payments yet.</p>
                     )}
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-center text-white">No rides available.</p>
+            <p className="text-center text-green-800">No rides available.</p>
           )}
         </div>
       </main>

@@ -1,3 +1,3 @@
 export const taxiContractAddress: `0x${string}` =
-    "0x158b979766916ae0aa75350e0d4c8b9fb94a7648";
+    "0xf86e15e9c3213c7bab2b04996ccea492c12a44d4";
 

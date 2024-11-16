@@ -1,7 +1,7 @@
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-green-500 to-yellow-500 p-6 text-white mt-8 w-full">
+    <footer className=" p-6 text-white mt-8 w-full">
       <div className="flex flex-col items-center justify-between max-w-4xl mx-auto md:flex-row">
         {/* Company Info */}
         <div className="mb-4 md:mb-0">

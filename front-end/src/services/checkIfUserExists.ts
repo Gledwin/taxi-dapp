@@ -1,5 +1,5 @@
 import { createPublicClient, custom } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 import { taxiContractABI } from "@/utils/abis/taxiContractABI";
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 
@@ -9,7 +9,7 @@ export const checkIfUserExists = async (
   if (window.ethereum) {
     try {
       const publicClient = createPublicClient({
-        chain: celoAlfajores,
+        chain: celo,
         transport: custom(window.ethereum),
       });
       try {

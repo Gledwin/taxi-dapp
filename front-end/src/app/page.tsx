@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { useRouter } from "next/navigation";
 import { TaxiUser } from "@/entities/taxiUser";
 import { getUserByWalletAddress } from "@/services/getUserByWalletAddress";
 import { checkIfUserExists } from "@/services/checkIfUserExists";
@@ -14,7 +13,8 @@ import DriverPage from "./roles/driver/driverPage";
 import { Ride } from "@/entities/taxiRide";
 import { Payment } from "@/entities/payments";
 import FunSpinner from "@/components/spinner";
-
+import Lottie from "react-lottie";
+import taxiAnimation from "@/components/animations/taxi.json"; // Adjust path if necessary
 
 export default function Home() {
   const [userExists, setUserExists] = useState(false);
@@ -25,6 +25,15 @@ export default function Home() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [message, setMessage] = useState<string | null>(null);
 
+  const lottieOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: taxiAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   useEffect(() => {
     const initializeUser = async () => {
       if (isConnected && address) {
@@ -33,10 +42,10 @@ export default function Home() {
           const doesUserExist = await checkIfUserExists(address);
           setUserExists(doesUserExist);
 
-         if (doesUserExist) {
-           const fetchedTaxiUser = await getUserByWalletAddress(address, { _walletAddress: address });
+          if (doesUserExist) {
+            const fetchedTaxiUser = await getUserByWalletAddress(address, { _walletAddress: address });
 
-            if (fetchedTaxiUser) {  // Check if fetchedTaxiUser is not null
+            if (fetchedTaxiUser) {
               setTaxiUser(fetchedTaxiUser);
 
               if (fetchedTaxiUser.isDriver) {
@@ -64,23 +73,25 @@ export default function Home() {
   }, [address, isConnected]);
 
   if (!isConnected || !address) {
-  return (
-    <main className="flex h-screen items-center justify-center bg-gradient-to-r from-yellow-500 to-green-500">
-      <p className="text-white">Connect your wallet to access the taxi system.</p>
-    </main>
-  );
-}
+    return (
+      <>
+        {/* Background Animation */}
+        <div className="absolute inset-0 -z-10">
+          <Lottie options={lottieOptions} height="100%" width="100%" />
+        </div>
 
+        {/* Connect Wallet Message */}
+        <main className="flex h-screen items-center justify-center bg-gradient-to-b from-black/40 to-black/70">
+          <p className="text-white text-lg font-bold">Connect your wallet to access the taxi system.</p>
+        </main>
+      </>
+    );
+  }
 
   if (isLoading) {
-    return (
-      <FunSpinner />
-
-    )
-    
-
-    
+    return <FunSpinner />;
   }
+
   return userExists && taxiUser ? (
     taxiUser.isDriver ? (
       <DriverPage address={address} rides={rides} message={message} setMessage={setMessage} taxiUser={taxiUser} />
@@ -90,5 +101,4 @@ export default function Home() {
   ) : (
     <BecomeAUser />
   );
-  
 }

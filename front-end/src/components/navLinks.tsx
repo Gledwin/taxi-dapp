@@ -11,11 +11,10 @@ const NavLink = ({ children, href, ...props }: NavLinkProps) => (
     px={2}
     py={1}
     rounded="md"
-    textColor="white"
+    textColor="green"
     _hover={{
       textColor: "black",
       textDecoration: "none",
-      bg: "white",
     }}
     href={href}
     {...props} // Spread other props here, including className if needed

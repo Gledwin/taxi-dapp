@@ -3,7 +3,7 @@ import {
     createWalletClient,
     custom,
 } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 import { taxiContractABI } from "@/utils/abis/taxiContractABI"; 
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress"; 
 
@@ -20,13 +20,13 @@ export const createNewRide = async (
     if (window.ethereum) {
         // Initialize the wallet client to handle transactions
         const privateClient = createWalletClient({
-            chain: celoAlfajores,
+            chain: celo,
             transport: custom(window.ethereum),
         });
 
         // Initialize the public client to retrieve the transaction receipt
         const publicClient = createPublicClient({
-            chain: celoAlfajores,
+            chain: celo,
             transport: custom(window.ethereum),
         });
 

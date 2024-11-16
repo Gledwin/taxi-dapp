@@ -1,5 +1,5 @@
 import { createPublicClient, custom } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 import { taxiContractABI } from "@/utils/abis/taxiContractABI";
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 import { TaxiUser } from "@/entities/taxiUser";
@@ -21,7 +21,7 @@ export const getUserByWalletAddress = async (
   let taxiUser: TaxiUser | null = null;
   if (window.ethereum) {
     const publicClient = createPublicClient({
-      chain: celoAlfajores,
+      chain: celo,
       transport: custom(window.ethereum),
     });
     try {

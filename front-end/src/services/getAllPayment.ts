@@ -1,5 +1,5 @@
 import { createPublicClient, custom } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 import { taxiContractABI } from "@/utils/abis/taxiContractABI";
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 import { Payment } from "@/entities/payments";
@@ -8,7 +8,7 @@ export const getAllPayments = async (): Promise<Payment[]> => {
   const allPayments: Payment[] = []; // Changed to const
   if (window.ethereum) {
     const publicClient = createPublicClient({
-      chain: celoAlfajores,
+      chain: celo,
       transport: custom(window.ethereum),
     });
     try {

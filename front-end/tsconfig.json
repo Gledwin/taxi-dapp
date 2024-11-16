@@ -10,6 +10,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
@@ -23,4 +24,5 @@
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
+ 
 }

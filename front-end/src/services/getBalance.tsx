@@ -1,5 +1,5 @@
 import { createPublicClient, custom, formatUnits } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 import { taxiContractABI } from "@/utils/abis/taxiContractABI";
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 
@@ -7,7 +7,7 @@ export const getBalance = async (_userAddress: `0x${string}` | undefined): Promi
     if (window.ethereum && _userAddress) {
         try {
             const publicClient = createPublicClient({
-                chain: celoAlfajores,
+                chain: celo,
                 transport: custom(window.ethereum),
             });
 

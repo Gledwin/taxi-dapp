@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Lottie from "react-lottie";
+import taxiAnimation from "@/components/animations/taxi.json"; // Adjust path to your taxi.json
 import { createUser } from "@/services/createUser";
 import { useAccount } from "wagmi";
 import { checkIfUserExists } from "@/services/checkIfUserExists";
 import { useRouter } from "next/navigation";
-import { TaxiUser } from "@/entities/taxiUser";
 import Footer from "@/components/footer";
 
 export default function BecomeAUser() {
   const router = useRouter();
   const { address } = useAccount();
 
-  const [taxiUser, setTaxiUser] = useState<TaxiUser | null>(null);
   const [isGettingStarted, setIsGettingStarted] = useState(false);
   const [userExists, setUserExists] = useState(false);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
@@ -93,112 +93,126 @@ export default function BecomeAUser() {
         _emailAddress: emailAddressInput,
         _isDriver: isDriver,
       });
-  
+
       if (isUserCreated) {
         setMessage("User creation successful.");
         setUserExists(true);
-        window.location.reload(); // Reload after user creation success
+        window.location.reload();
       } else {
         setMessage("User creation failed. Please try again.");
       }
       setIsCreatingUser(false);
     }
   };
-  
+
+  const lottieOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: taxiAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
 
   return (
     <>
-      <main className="flex h-screen flex-col items-center justify-center">
-        <img src="/pictures/taxi-icon.jpg" alt="Taxi Icon" className="w-25 h-24" />
+      {/* Background Animation */}
+      <div className="absolute inset-0 -z-10">
+        <Lottie options={lottieOptions} height="100%" width="100%" />
+      </div>
 
-        {message && (
-          <div className="fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-gradient-to-r from-green-400 to-yellow-300 shadow-lg transform transition duration-500 ease-in-out animate-bounce" style={{ fontFamily: "Comic Sans MS, cursive", borderRadius: "8px", boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)" }}>
-            {message}
-          </div>
-        )}
-        <h3 className="font-normal text-lg py-8 text-center">Welcome to the Cashless Taxi System</h3>
+      {/* Main Content */}
+      <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-black/40 to-black/70 p-6">
+        {/* Intro Card */}
+        <section >
+          <h2 className="text-3xl font-extrabold text-white">Welcome to Cashless Taxi</h2>
+          <p className="text-white mt-4 leading-relaxed">
+            Join us today for a seamless taxi experience! Whether you're a driver or passenger,
+            enjoy safe, cashless rides with ease.
+          </p>
+        </section>
 
-        {userExists ? (
-          <button
-            onClick={() => router.push("/")}
-            className="bg-green-500 text-white hover:bg-yellow-500 py-2 px-4 rounded"
-          >
-            All set
-          </button>
-        ) : (
+        {/* Get Started Section */}
+        <div className="w-full  p-6 rounded-lg shadow-lg text-center mt-4 max-w-md">
+          <h2 className="text-lg font-bold text-white">
+            {userExists ? "Welcome Back!" : "Become a user"}
+          </h2>
+          <p className="text-white mt-2">
+            {userExists
+              ? "You're all set! Enjoy our services."
+              : "Register your wallet to continue."}
+          </p>
+        </div>
+
+        {!userExists && (
           <button
             onClick={() => setIsGettingStarted(true)}
-            className={`bg-yellow-500 text-white hover:bg-green-500 py-2 px-4 rounded ${isGettingStarted ? "cursor-not-allowed" : ""}`}
-            disabled={isGettingStarted}
+            className="bg-yellow-400 text-white font-bold py-2 px-6 rounded-full shadow-lg mt-6 transform transition-all hover:scale-105 hover:bg-yellow-500"
           >
-            {isGettingStarted ? "Setting Up" : "Get started"}
+            {isGettingStarted ? "Setting Up..." : "Get Started"}
           </button>
         )}
 
         {isGettingStarted && (
-          <div className="fixed inset-0 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 w-96 bg-gradient-to-r from-green-400 to-yellow-300">
-              <h3 className="text-lg font-semibold">Become a User</h3>
-
-              <label className="block mt-4">
-                <span>Username</span>
-                <input
-                  className="mt-1 block w-full border rounded-md p-2"
-                  type="text"
-                  placeholder="yourUsername"
-                  value={usernameInput}
-                  onChange={handleUsernameInputChange}
-                />
-                {usernameError && <p className="text-red-600">{usernameError}</p>}
-              </label>
-
-              <label className="block mt-4">
-                <span>Email</span>
-                <input
-                  className="mt-1 block w-full border rounded-md p-2"
-                  type="email"
-                  placeholder="e.g. youremail@gmail.com"
-                  value={emailAddressInput}
-                  onChange={handleEmailAddressInputChange}
-                />
-                {emailError && <p className="text-red-600">{emailError}</p>}
-              </label>
-
-              <label className="block mt-4">
-                <span>Role</span>
-                <select
-                  className="mt-1 block w-full border rounded-md p-2"
-                  value={roleInput}
-                  onChange={handleRoleChange}
-                >
-                  <option value="">Select a role</option>
-                  <option value="driver">Driver</option>
-                  <option value="passenger">Passenger</option>
-                </select>
-                {roleError && <p className="text-red-600">{roleError}</p>}
-              </label>
-
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={onClickCreateUser}
-                  className={`bg-yellow-500 text-white hover:bg-green-500 py-2 px-4 rounded ${isCreatingUser ? "cursor-not-allowed" : ""}`}
-                  disabled={isCreatingUser}
-                >
-                  {isCreatingUser ? "Creating User" : "Continue"}
-                </button>
-                <button
-                  onClick={() => setIsGettingStarted(false)}
-                  className="ml-2 text-gray-600"
-                >
-                  Cancel
-                </button>
-              </div>
+          <form className="w-full space-y-6 mt-6 max-w-lg">
+            <div>
+              <label className="block text-white font-bold mb-2">Username</label>
+              <input
+                className="w-full border border-gray-300 rounded-full px-4 py-3 focus:ring-2 focus:ring-yellow-500"
+                type="text"
+                placeholder="Enter username"
+                value={usernameInput}
+                onChange={handleUsernameInputChange}
+              />
+              {usernameError && <p className="text-red-600 mt-2">{usernameError}</p>}
             </div>
-          </div>
+
+            <div>
+              <label className="block text-white font-bold mb-2">Email Address</label>
+              <input
+                className="w-full border border-gray-300 rounded-full px-4 py-3 focus:ring-2 focus:ring-yellow-500"
+                type="email"
+                placeholder="Enter email"
+                value={emailAddressInput}
+                onChange={handleEmailAddressInputChange}
+              />
+              {emailError && <p className="text-red-600 mt-2">{emailError}</p>}
+            </div>
+
+            <div>
+              <label className="block text-white font-bold mb-2">Role</label>
+              <select
+                className="w-full border border-gray-300 rounded-full px-4 py-3 focus:ring-2 focus:ring-yellow-500"
+                value={roleInput}
+                onChange={handleRoleChange}
+              >
+                <option value="">Choose your role</option>
+                <option value="driver">Driver</option>
+                <option value="passenger">Passenger</option>
+              </select>
+              {roleError && <p className="text-red-600 mt-2">{roleError}</p>}
+            </div>
+
+            <button
+              onClick={onClickCreateUser}
+              className={`w-full bg-yellow-400 text-white font-bold py-3 rounded-full shadow-md transform transition-all hover:scale-105 hover:bg-yellow-500 ${
+                isCreatingUser ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={isCreatingUser}
+            >
+              {isCreatingUser ? "Creating..." : "Continue"}
+            </button>
+
+            <button
+              onClick={() => setIsGettingStarted(false)}
+              className="w-full text-white mt-4 underline hover:text-gray-200"
+            >
+              Cancel
+            </button>
+          </form>
         )}
       </main>
-
-      <Footer/>
+      <Footer />
     </>
   );
 }

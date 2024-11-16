@@ -1,15 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation"; // Import useParams instead of useRouter
+import { useParams } from "next/navigation";
 import { Ride } from "@/entities/taxiRide";
 import Footer from "@/components/footer";
 import { Payment } from "@/entities/payments";
 import { getAllPaymentsByRideId } from "@/services/getPaymentsByRide";
 import { getUserByWalletAddress } from "@/services/getUserByWalletAddress";
 import { getRideById } from "@/services/getRideById";
-import { FaUser, FaCar, FaMapMarkerAlt, FaMoneyBill, FaCalendarAlt } from "react-icons/fa";
-
+import FunSpinner from "@/components/spinner";
+import {
+  FaUser,
+  FaCar,
+  FaMapMarkerAlt,
+  FaMoneyBill,
+  FaCalendarAlt,
+} from "react-icons/fa";
 
 interface PaymentWithUser extends Payment {
   username: string;
@@ -22,120 +28,173 @@ interface RideWithEarnings extends Ride {
 
 export default function RideOverview() {
   const [rideWithEarnings, setRideWithEarnings] = useState<RideWithEarnings | null>(null);
-  const { id: rideId} = useParams(); // Use useParams to get rideId
+  const [loading, setLoading] = useState(true); // Loading state
+  const { id: rideId } = useParams();
 
   useEffect(() => {
     if (!rideId) return;
 
     const fetchRideWithEarnings = async () => {
-      const ride = await getRideById(Number(rideId));
-      if (!ride || !ride.isCompleted) {
-        setRideWithEarnings(null);
-        return;
+      setLoading(true); // Set loading to true
+      try {
+        const ride = await getRideById(Number(rideId));
+        if (!ride || !ride.isCompleted) {
+          setRideWithEarnings(null);
+          return;
+        }
+
+        const payments = await getAllPaymentsByRideId(ride.id);
+
+        const validPayments = await Promise.all(
+          payments
+            .filter(payment => payment.passengerWalletAddress !== "0x0000000000000000000000000000000000000000")
+            .map(async (payment) => {
+              const user = await getUserByWalletAddress(undefined, {
+                _walletAddress: payment.passengerWalletAddress,
+              });
+              return {
+                ...payment,
+                username: user?.username || payment.passengerWalletAddress,
+              };
+            })
+        );
+
+        const totalEarnings = validPayments.reduce(
+          (acc, payment) => acc + Number(payment.amountPaidInEthers),
+          0
+        );
+
+        setRideWithEarnings({
+          ...ride,
+          totalEarnings,
+          payments: validPayments,
+        });
+      } catch (error) {
+        console.error("Error fetching ride data:", error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
       }
-
-      const payments = await getAllPaymentsByRideId(ride.id);
-
-      const validPayments = await Promise.all(
-        payments
-          .filter(payment => payment.passengerWalletAddress !== "0x0000000000000000000000000000000000000000")
-          .map(async (payment) => {
-            const user = await getUserByWalletAddress(
-              undefined,
-              { _walletAddress: payment.passengerWalletAddress }
-            );
-            return {
-              ...payment,
-              username: user?.username || payment.passengerWalletAddress,
-            };
-          })
-      );
-
-      const totalEarnings = validPayments.reduce((acc, payment) => acc + Number(payment.amountPaidInEthers), 0);
-
-      setRideWithEarnings({
-        ...ride,
-        totalEarnings,
-        payments: validPayments,
-      });
     };
 
     fetchRideWithEarnings();
   }, [rideId]);
 
+  if (loading) {
+    return <FunSpinner />; // Show spinner during loading
+  }
+
   return (
     <>
       <main className="flex flex-col items-center p-6 text-black min-h-screen">
-        <h4 className="text-3xl font-extrabold pt-6 pb-2 text-green-800">Ride Overview</h4>
+        {/* Heading */}
+        <h4 className="text-4xl font-extrabold py-6 text-green-800">Ride Overview 🚖</h4>
 
         {rideWithEarnings ? (
-          <div className="space-y-8 max-w-4xl w-full">
-            <div className="bg-white shadow-lg rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Driver and Vehicle Info */}
-              <div className="flex flex-col space-y-2 p-4 bg-gradient-to-r from-green-500 to-yellow-500 rounded-lg shadow-md">
-                <div className="flex items-center space-x-2">
-                  <FaUser className="text-xl text-green-800" />
-                  <p><strong>Driver:</strong> {rideWithEarnings.driverName}</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <FaCar className="text-xl text-green-800" />
-                  <p><strong>License Plate:</strong> {rideWithEarnings.licensePlate}</p>
-                </div>
+          <div className="space-y-8 max-w-5xl w-full">
+            {/* Ride Details Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-6 bg-green-800 rounded-lg shadow-lg hover:scale-105 transform transition-all duration-300">
+                <h5 className="text-lg font-bold text-white mb-4">Driver Information</h5>
+                <p className="flex items-center text-white space-x-2">
+                  <FaUser className="text-xl" />
+                  <span><strong>Name:</strong> {rideWithEarnings.driverName}</span>
+                </p>
+                <p className="flex items-center text-white space-x-2">
+                  <FaCar className="text-xl " />
+                  <span><strong>License Plate:</strong> {rideWithEarnings.licensePlate}</span>
+                </p>
               </div>
 
-              {/* Trip Info */}
-              <div className="flex flex-col space-y-2 p-4 bg-gradient-to-r from-green-500 to-yellow-500 rounded-lg shadow-md">
-                <div className="flex items-center space-x-2">
-                  <FaMapMarkerAlt className="text-xl text-blue-800" />
-                  <p><strong>Destination:</strong> {rideWithEarnings.destination}</p>
+              <div className="p-6 bg-green-800 rounded-lg shadow-lg hover:scale-105 transform transition-all duration-300">
+                <h5 className="text-lg font-bold text-white mb-4">Trip Details</h5>
+                <div>
+                  <p className="flex items-center text-white space-x-2">
+                    <FaMapMarkerAlt className="text-xl " />
+                    <span><strong>Destination:</strong> {rideWithEarnings.destination}</span>
+                  </p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <FaCalendarAlt className="text-xl text-yellow-800" />
-                  <p><strong>Created At:</strong> {new Date(Number(rideWithEarnings.updatedAt) * 1000).toLocaleString()}</p>
+                <div>
+                  <p className="flex items-center text-white  space-x-2">
+                    <FaCalendarAlt className="text-xl " />
+                    <span><strong>Date:</strong> {new Date(Number(rideWithEarnings.updatedAt) * 1000).toLocaleString()}</span>
+                  </p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <FaMoneyBill className="text-xl text-blue-800" />
-                  <p><strong>Fare:</strong> {rideWithEarnings.fareInEthers} cUSD</p>
+                <div>
+                  <p className="flex items-center text-white space-x-2">
+                    <FaMoneyBill className="text-xl" />
+                    <span><strong>Fare:</strong> {rideWithEarnings.fareInEthers} celo</span>
+                  </p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <FaUser className="text-xl text-blue-800" />
-                  <p><strong>Passengers still yet to pay:</strong> {rideWithEarnings.numPassengers}</p>
+                <div>
+                  <p className="flex items-center text-white space-x-2">
+                    <FaUser className="text-xl" />
+                    <span><strong>Passengers who did not pay:</strong> {rideWithEarnings.numPassengers}</span>
+                  </p>
                 </div>
               </div>
+            </div>
 
-              {/* Earnings and Completion Info */}
-              <div className="flex flex-col space-y-2 p-4 bg-gradient-to-r from-green-500 to-yellow-500 rounded-lg shadow-md md:col-span-2">
-                <div className="flex items-center space-x-2">
-                  <FaMoneyBill className="text-xl text-yellow-800" />
-                  <p><strong>Total Earnings:</strong> {rideWithEarnings.totalEarnings.toFixed(2)} cUSD</p>
-                </div>
-              </div>
+            {/* Earnings Section */}
+            <div className="p-6 bg-green-800 rounded-lg shadow-lg text-center hover:scale-105 transform transition-all duration-300">
+              <h5 className="text-xl font-bold text-white mb-2">Total Earnings</h5>
+              <p className="text-3xl font-extrabold text-white">
+                {rideWithEarnings.totalEarnings.toFixed(2)} celo
+              </p>
+            </div>
 
-              {/* Payments Section */}
-              <div className="md:col-span-2 mt-4">
-                <h6 className="font-bold text-lg mb-2 text-center text-green-800">Payments</h6>
-                {rideWithEarnings.payments.length > 0 ? (
-                  <ul className="space-y-2">
-                    {rideWithEarnings.payments.map((payment) => (
-                      <li key={payment.id} className="flex flex-col space-y-1 bg-gradient-to-r from-green-500 to-yellow-500 rounded-md p-4 shadow-md">
-                        <p><strong>Passenger:</strong> {payment.username}</p>
-                        <p><strong>Address:</strong> {payment.passengerWalletAddress}</p>
-                        <p><strong>Amount Paid:</strong> {payment.amountPaidInEthers.toString()} cUSD</p>
-                        <p><strong>Paid At:</strong> {new Date(Number(payment.paidAt) * 1000).toLocaleString()}</p>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-center text-gray-500">No payments available.</p>
-                )}
-              </div>
+            {/* Payments Section */}
+            <div className="mt-8">
+              <h5 className="font-bold text-3xl text-green-700 text-center mb-8">
+                Passenger Payments
+              </h5>
+              {rideWithEarnings.payments.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {rideWithEarnings.payments.map((payment) => (
+                    <div
+                      key={payment.id}
+                      className="relative bg-green-800 shadow-lg rounded-xl p-6 border border-gray-200 transform hover:scale-105 transition-transform duration-300"
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-4">
+                          <FaUser className="text-white text-3xl" />
+                          <div>
+                            <p className="text-lg font-bold text-white">{payment.username}</p>
+                            <p className="text-sm text-white break-all">
+                              {payment.passengerWalletAddress}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Payment Details */}
+                      <div className="space-y-3 text-white">
+                        <p className=" text-lg">
+                          <strong>Paid:</strong> {payment.amountPaidInEthers.toString()} cUSD
+                        </p>
+                        <p className=" text-lg">
+                          <strong>Date at:</strong> {new Date(Number(payment.paidAt) * 1000).toLocaleString()}
+                        </p>
+                      </div>
+
+                      {/* Decorative Badge */}
+                      <div className="absolute top-4 right-4 bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                        PAID
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-gray-600">No payments available yet.</p>
+              )}
             </div>
           </div>
         ) : (
-          <p className="text-center text-white">No completed ride found.</p>
+          <p className="text-center text-red-500 mt-10">No completed ride found.</p>
         )}
       </main>
 
+      {/* Footer */}
       <Footer />
     </>
   );

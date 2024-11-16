@@ -29,15 +29,15 @@ export default function CreateRide() {
 
   const handleCreateRide = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (!rideName || !rideDate || fareInEthers <= 0 || numPassengers <= 0 || !licensePlate || !driverName) {
       setMessage("Please fill in all fields.");
       return;
     }
-
+  
     setIsSubmitting(true);
     setMessage(null);
-
+  
     try {
       const newRide = await createNewRide({
         _destination: rideName,
@@ -47,18 +47,23 @@ export default function CreateRide() {
         _licensePlate: licensePlate,
         _driverName: driverName
       });
-
+  
       if (newRide) {
         setMessage("Ride successfully created!");
-        router.push("/");
+        setTimeout(() => {
+          router.push("/"); // Navigate to homepage after 5 seconds
+        }, 5000);
       }
     } catch (err) {
       setMessage("Failed to create ride. Please try again.");
+      setTimeout(() => {
+        setMessage(null); // Clear the message after 5 seconds
+      }, 5000);
     } finally {
       setIsSubmitting(false);
     }
   };
-
+  
   const handleFareChange = (value: number) => {
     setFareInEthers(value);
     setTotalFare(value * numPassengers);
@@ -70,122 +75,134 @@ export default function CreateRide() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <h2 className="text-2xl py-4 text-center font-bold pb-4 text-green-800 font-medium drop-shadow-lg">
-        Create a Ride!
-      </h2>
+<>
+{message && (
+          <div className="fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-green-500 shadow-lg">
+            {message}
+          </div>
+        )}
 
-      <form
-        className="flex flex-col gap-6 w-full max-w-md p-6 bg-gradient-to-r from-green-400 to-yellow-300 rounded-lg shadow-lg border border-blue-500"
-        onSubmit={handleCreateRide}
-      >
-        {message && <p className="text-red-500 font-semibold">{message}</p>}
-        
-        {/* Loading Spinner */}
-        {isSubmitting }
+    <div className="flex flex-col items-center justify-center min-h-screen  p-4">
+  <h2 className="text-3xl font-extrabold text-green-800 mb-8">
+    Create a Ride!
+  </h2>
 
-        <div className="flex flex-col">
-          <label className="text-green-800 font-medium" htmlFor="rideName">
-            🎈 Ride Name
-          </label>
-          <input
-            id="rideName"
-            type="text"
-            placeholder="Enter ride name"
-            value={rideName}
-            onChange={(e) => setRideName(e.target.value)}
-            className="border border-blue-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
-            disabled={isSubmitting}
-          />
-        </div>
+ 
+  <form
+    className="flex flex-col gap-6 w-full max-w-lg p-6 bg-white rounded-3xl shadow-lg border border-green-800"
+    onSubmit={handleCreateRide}
+  >
+   
 
-        <div className="flex flex-col">
-          <label className="text-green-800 font-medium" htmlFor="rideDate">
-            📅 Ride Date
-          </label>
-          <input
-            id="rideDate"
-            type="date"
-            value={rideDate}
-            onChange={(e) => setRideDate(e.target.value)}
-            className="border border-blue-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <label className="text-green-800 font-medium" htmlFor="fareInEthers">
-            💰 Fare
-          </label>
-          <input
-            id="fareInEthers"
-            type="number"
-            placeholder="Enter fare in ethers"
-            value={fareInEthers}
-            onChange={(e) => handleFareChange(Number(e.target.value))}
-            className="border border-blue-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <label className="text-green-800 font-medium" htmlFor="numPassengers">
-            👥 Number of Passengers
-          </label>
-          <input
-            id="numPassengers"
-            type="number"
-            placeholder="Enter number of passengers"
-            value={numPassengers}
-            onChange={(e) => handlePassengerChange(Number(e.target.value))}
-            min="1"
-            className="border border-blue-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <label className="text-green-800 font-medium" htmlFor="licensePlate">
-            🚗 License Plate
-          </label>
-          <input
-            id="licensePlate"
-            type="text"
-            placeholder="Enter license plate"
-            value={licensePlate}
-            onChange={(e) => setLicensePlate(e.target.value)}
-            className="border border-blue-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <label className="text-green-800 font-medium" htmlFor="driverName">
-            🧑‍✈️ Driver's Name
-          </label>
-          <input
-            id="driverName"
-            type="text"
-            placeholder="Enter driver's name"
-            value={driverName}
-            onChange={(e) => setDriverName(e.target.value)}
-            className="border border-blue-500 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <p className="text-green-800 font-bold">Total Fare: {totalFare} cUSD</p>
-
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200 transform hover:scale-105"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Creating..." : "Create Ride"}
-        </button>
-      </form>
-
-      <Footer />
+    <div className="flex flex-col gap-2">
+      <label className="text-green-800 font-medium" htmlFor="rideName">
+        🎈 Ride Name
+      </label>
+      <input
+        id="rideName"
+        type="text"
+        placeholder="Enter ride name"
+        value={rideName}
+        onChange={(e) => setRideName(e.target.value)}
+        className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"
+        disabled={isSubmitting}
+      />
     </div>
-  );
+
+    <div className="flex flex-col gap-2">
+      <label className="text-green-800 font-medium" htmlFor="rideDate">
+        📅 Ride Date
+      </label>
+      <input
+        id="rideDate"
+        type="date"
+        value={rideDate}
+        onChange={(e) => setRideDate(e.target.value)}
+        className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"
+        disabled={isSubmitting}
+      />
+    </div>
+
+    <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col gap-2">
+        <label className="text-green-800 font-medium" htmlFor="fareInEthers">
+          💰 Fare
+        </label>
+        <input
+          id="fareInEthers"
+          type="number"
+          placeholder="Fare in ethers"
+          value={fareInEthers}
+          onChange={(e) => handleFareChange(Number(e.target.value))}
+          className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"
+          disabled={isSubmitting}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-green-800 font-medium" htmlFor="numPassengers">
+          👥 Passengers
+        </label>
+        <input
+          id="numPassengers"
+          type="number"
+          placeholder="Number of passengers"
+          value={numPassengers}
+          onChange={(e) => handlePassengerChange(Number(e.target.value))}
+          min="1"
+          className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"
+          disabled={isSubmitting}
+        />
+      </div>
+    </div>
+
+    <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col gap-2">
+        <label className="text-green-800 font-medium" htmlFor="licensePlate">
+          🚗 License Plate
+        </label>
+        <input
+          id="licensePlate"
+          type="text"
+          placeholder="Enter license plate"
+          value={licensePlate}
+          onChange={(e) => setLicensePlate(e.target.value)}
+          className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"
+          disabled={isSubmitting}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-green-800 font-medium" htmlFor="driverName">
+          🧑‍✈️ Driver's Name
+        </label>
+        <input
+          id="driverName"
+          type="text"
+          placeholder="Driver's name"
+          value={driverName}
+          onChange={(e) => setDriverName(e.target.value)}
+          className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"
+          disabled={isSubmitting}
+        />
+      </div>
+    </div>
+
+    <p className="text-green-800 font-bold text-center">
+      Total Fare: {totalFare} cUSD
+    </p>
+
+    <button
+      type="submit"
+      className="w-full bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-600 transition duration-200 transform hover:scale-105"
+      disabled={isSubmitting}
+    >
+      {isSubmitting ? "Creating..." : "Create Ride"}
+    </button>
+  </form>
+
+  <Footer />
+</div>
+</>
+  )
 }

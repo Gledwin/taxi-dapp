@@ -1,5 +1,5 @@
 import { createPublicClient, custom } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 import { taxiContractABI } from "@/utils/abis/taxiContractABI";
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress";
 import { Ride } from "@/entities/taxiRide"; // Assuming you have an entity for Ride
@@ -24,7 +24,7 @@ type RideContractResponse = {
 export const getRideById = async (rideId: number): Promise<Ride | null> => {
   if (window.ethereum) {
     const publicClient = createPublicClient({
-      chain: celoAlfajores,
+      chain: celo,
       transport: custom(window.ethereum),
     });
 

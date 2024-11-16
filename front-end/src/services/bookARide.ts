@@ -3,7 +3,7 @@ import {
     createPublicClient,
     custom
 } from "viem";
-import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains"; // Update to Celo Mainnet
 import { taxiContractABI } from "@/utils/abis/taxiContractABI"; // Replace with your ABI
 import { taxiContractAddress } from "@/utils/addresses/taxiContractAddress"; // Replace with your contract address
 
@@ -13,11 +13,11 @@ export const bookRide = async (
 ): Promise<boolean> => {
     if (window.ethereum) {
         const walletClient = createWalletClient({
-            chain: celoAlfajores,
+            chain: celo, // Use Celo Mainnet
             transport: custom(window.ethereum),
         });
         const publicClient = createPublicClient({
-            chain: celoAlfajores,
+            chain: celo, // Use Celo Mainnet
             transport: custom(window.ethereum),
         });
 
