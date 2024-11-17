@@ -149,7 +149,7 @@ export default function DriverPage({
             Hi, {taxiUser?.username || "Driver"}
           </h4>
           <p className="text-left text-gray-400">Your Current Balance</p>
-          <p className="text-left text-5xl font-bold mt-4 mb-6">{balance} celo</p>
+          <p className="text-left text-5xl font-bold mt-4 mb-6">{balance} cUSD</p>
         </div>
         <div className="w-full max-w-md mb-6 flex justify-around text-white gap-4">
   <button
@@ -181,6 +181,7 @@ export default function DriverPage({
                   key={ride.id.toString()}
                   className="bg-green-800 rounded-3xl p-6 shadow-lg text-white"
                 >
+
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold flex items-center gap-2">
                       <FaMapMarkerAlt className="text-white" /> {ride.destination}
@@ -238,14 +239,14 @@ export default function DriverPage({
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-400">No payments yet.</p>
+                      <p className="text-sm text-gray-400 ">No payments yet.</p>
                     )}
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-center text-green-800">No rides available.</p>
+            <p className="text-centerfont-medium bg-gray-200 p-4 rounded-lg text-green-800">No rides available.</p>
           )}
         </div>
       </main>

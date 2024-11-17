@@ -190,7 +190,7 @@ export default function PassengerPage({
 
        <div className="bg-green-800 text-white p-4 rounded-lg shadow-md w-full max-w-md mt-4 text-center">
           <h5 className="text-lg font-bold">Your Current balance</h5>
-          <p className="text-xl font-semibold">{balance} celo</p>
+          <p className="text-xl font-semibold">{balance} cUSD</p>
         </div>
 
         <div className="flex w-full max-w-md mt-4">
@@ -232,7 +232,7 @@ export default function PassengerPage({
                 Available Rides
               </h3>
               {rides.length === 0 ? (
-                <p className="text-center text-gray-600 font-medium">
+                <p className="text-center text-gray-600 font-medium bg-gray-200 p-4 rounded-lgfont-medium">
                   <FaExclamationCircle className="inline mr-2" />
                   No rides available.
                 </p>
@@ -265,7 +265,7 @@ export default function PassengerPage({
                         <strong>
                           <FaMoneyBill className="inline mr-1" /> Fare:
                         </strong>{" "}
-                        {ride.fareInEthers} celo
+                        {ride.fareInEthers} cUSD
                       </p>
                       <p className="text-gray-800 mb-4">
                         <strong>
@@ -372,7 +372,7 @@ export default function PassengerPage({
                           <FaMoneyBill className="inline mr-1 text-green-500" />
                           Amount Paid:{" "}
                           <span className="font-bold text-gray-700">
-                            {payment.amountPaidInEthers} celo
+                            {payment.amountPaidInEthers} cUSD
                           </span>
                         </p>
                         <p className="text-sm text-gray-500">
@@ -395,7 +395,7 @@ export default function PassengerPage({
                 </div>
               ))
             ) : (
-              <p className="text-center text-black font-medium bg-yellow-200 p-4 rounded-lg">
+              <p className="text-center text-black font-medium bg-gray-200 p-4 rounded-lg">
                 <FaExclamationCircle className="inline mr-2" />
                 No payment history available.
               </p>

@@ -116,10 +116,10 @@ function CompletedRidesContent() {
                               </li>
                               <li className="flex items-center gap-2">
                                 <FaMoneyBillWave className="text-green-600" />{" "}
-                                <span>{ride.fareInEthers} celo</span>
+                                <span>{ride.fareInEthers} cUSD</span>
                               </li>
                               <li className="flex items-center gap-2">
-                                <strong className="text-green-600">License:</strong> {ride.licensePlate}
+                                <strong className="text-green-600">License plate:</strong> {ride.licensePlate}
                               </li>
                             </ul>
                           </Link>

@@ -1,2 +1,2 @@
 export const cUSDAlfajoresContractAddress: `0x${string}` =
-"0x471EcE3750Da237f93B8E339c536989b8978a438";
+"0x765DE816845861e75A25fCA122bb6898B8B1282a";

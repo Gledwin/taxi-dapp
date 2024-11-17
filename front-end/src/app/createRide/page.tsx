@@ -201,7 +201,7 @@ export default function CreateRide() {
           </div>
 
           <p className="text-green-800 font-bold text-center">
-            Total Fare: {totalFare} celo
+            Total Fare: {totalFare} cUSD
           </p>
 
           <button
