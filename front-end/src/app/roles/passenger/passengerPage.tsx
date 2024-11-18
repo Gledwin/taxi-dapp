@@ -287,7 +287,7 @@ export default function PassengerPage({
                       />
                       <button
                         onClick={() => handlePayForRide(ride.id)}
-                        className="block w-full text-center bg-green-800 text-white font-bold py-2 rounded-lg shadow-md hover:bg-green-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        className="block w-full text-center bg-green-800 text-white font-bold py-2 rounded-lg shadow-md hover:bg-teal-600 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
                       >
                         Pay now
                       </button>

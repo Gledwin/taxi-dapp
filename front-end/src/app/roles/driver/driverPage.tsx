@@ -207,7 +207,7 @@ export default function DriverPage({
 
                   <button
                     onClick={() => handleCompleteRide(ride.id)}
-                    className="w-full py-2 text-sm font-semibold bg-yellow-500 rounded-lg hover:bg-blue-700 transition"
+                    className="w-full py-2 text-sm font-semibold bg-yellow-500 rounded-lg hover:bg-teal-600 transition"
                   >
                     Mark as Complete
                   </button>

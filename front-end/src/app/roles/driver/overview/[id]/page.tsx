@@ -72,7 +72,7 @@ export default function RideOverview() {
       } catch (error) {
         console.error("Error fetching ride data:", error);
       } finally {
-        setLoading(false); // Set loading to false after fetching
+        setLoading(false); 
       }
     };
 
@@ -80,7 +80,7 @@ export default function RideOverview() {
   }, [rideId]);
 
   if (loading) {
-    return <FunSpinner />; // Show spinner during loading
+    return <FunSpinner />; 
   }
 
   return (
@@ -173,7 +173,7 @@ export default function RideOverview() {
                           <strong>Paid:</strong> {payment.amountPaidInEthers.toString()} cUSD
                         </p>
                         <p className=" text-lg">
-                          <strong>Date at:</strong> {new Date(Number(payment.paidAt) * 1000).toLocaleString()}
+                          <strong>Paid at:</strong> {new Date(Number(payment.paidAt) * 1000).toLocaleString()}
                         </p>
                       </div>
 
