@@ -105,10 +105,14 @@ function CompletedRidesContent() {
                           className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
                         >
                           <Link href={`/roles/driver/overview/${ride.id}`} className="block">
+                            
                             <h6 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                               <FaMapMarkerAlt className="text-green-600" /> {ride.destination}
                             </h6>
                             <ul className="space-y-2 text-gray-600 text-sm">
+                            <li className="flex items-center gap-2">
+                                <strong className="text-green-600">ID:</strong> {ride.id}
+                              </li>
                               <li className="flex items-center gap-2">
                                 <FaCalendarAlt className="text-green-600" />{" "}
                                 <span>

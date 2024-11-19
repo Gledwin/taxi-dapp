@@ -214,19 +214,47 @@ export default function DriverPage({
                   >
                     Mark as Complete
                   </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-centerfont-medium bg-gray-200 p-4 rounded-lg text-green-800">
-              No rides available.
-            </p>
-          )}
-        </div>
-      </main>
+                
+               <div className="mt-6 ">
+               <h4 className="font-bold text-gray-200 mb-2">Payments</h4>
+               {ridePayments[ride.id.toString()] &&
+               ridePayments[ride.id.toString()].length > 0 ? (
+                 <div className="space-y-4">
+                   {ridePayments[ride.id.toString()].map((payment) => (
+                     <div
+                       key={payment.id}
+                       className="bg-green-800 p-4 rounded-lg shadow-md"
+                     >
+                       <div className="flex justify-between items-center mb-2">
+                         <p className="font-bold text-white flex items-center gap-2">
+                           <FaWallet /> {payment.username}
+                         </p>
+                         <p className="text-xs text-gray-400">
+                           <FaClock className="inline-block mr-1" />
+                           {new Date(Number(payment.paidAt) * 1000).toLocaleString()}
+                         </p>
+                       </div>
+                       <p>
+                         <strong className="text-gray-300">Paid:</strong>{" "}
+                         <span className="text-green-400">{formatEther(BigInt(payment.amountPaidInEthers))} cUSD</span>
+                       </p>
+                     </div>
+                   ))}
+                 </div>
+               ) : (
+                 <p className="text-sm text-gray-400 ">No payments yet.</p>
+               )}
+             </div>
+           </li>
+         ))}
+       </ul>
+     ) : (
+       <p className="text-centerfont-medium bg-gray-200 p-4 rounded-lg text-green-800">No rides available.</p>
+     )}
+   </div>
+ </main>
 
-      <Footer />
-    </>
-  );
+ <Footer />
+</>
+);
 }
-
