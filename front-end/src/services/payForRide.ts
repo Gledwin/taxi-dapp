@@ -57,6 +57,8 @@ export const payForRide = async (
 
 type PayForRideProps = {
   _rideId: number;
-  fareAmount: BigInt;
+  fareAmount: bigint; 
   _numPeoplePayingFor: number;
 };
+
+
