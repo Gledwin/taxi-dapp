@@ -26,9 +26,9 @@ const getCurrentDate = () => {
 export default function CreateRide() {
   const [rideName, setRideName] = useState("");
   const [rideDate, setRideDate] = useState(getCurrentDate()); // Default to today's date
-  const [fareInEthers, setFareInEthers] = useState(0);
-  const [numPassengers, setNumPassengers] = useState(1);
-  const [totalFare, setTotalFare] = useState(0);
+  const [fareInEthers, setFareInEthers] = useState<number | "">(""); // Start with an empty value
+  const [numPassengers, setNumPassengers] = useState<number | "">(""); // Start with an empty value
+  const [totalFare, setTotalFare] = useState<number>(0);
   const [licensePlate, setLicensePlate] = useState("");
   const [driverName, setDriverName] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -41,12 +41,17 @@ export default function CreateRide() {
     if (
       !rideName ||
       !rideDate ||
+      fareInEthers === "" ||
+      numPassengers === "" ||
       fareInEthers <= 0 ||
       numPassengers <= 0 ||
       !licensePlate ||
       !driverName
     ) {
       setMessage("Please fill in all fields.");
+      setTimeout(() => {
+        setMessage(null); // Clear the message after 5 seconds
+      }, 5000);
       return;
     }
 
@@ -79,14 +84,16 @@ export default function CreateRide() {
     }
   };
 
-  const handleFareChange = (value: number) => {
-    setFareInEthers(value);
-    setTotalFare(value * numPassengers);
+  const handleFareChange = (value: string) => {
+    const numericValue = Number(value);
+    setFareInEthers(value === "" ? "" : numericValue);
+    setTotalFare(numericValue * (numPassengers || 0));
   };
 
-  const handlePassengerChange = (value: number) => {
-    setNumPassengers(value);
-    setTotalFare(fareInEthers * value);
+  const handlePassengerChange = (value: string) => {
+    const numericValue = Number(value);
+    setNumPassengers(value === "" ? "" : numericValue);
+    setTotalFare((fareInEthers || 0) * numericValue);
   };
 
   return (
@@ -138,14 +145,14 @@ export default function CreateRide() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-green-800 font-medium" htmlFor="fareInEthers">
-                <FaMoneyBillWave/> Fare
+                <FaMoneyBillWave /> Fare
               </label>
               <input
                 id="fareInEthers"
                 type="number"
-                placeholder="Fare"
+                placeholder="Fare in ethers"
                 value={fareInEthers}
-                onChange={(e) => handleFareChange(Number(e.target.value))}
+                onChange={(e) => handleFareChange(e.target.value)}
                 className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"
                 disabled={isSubmitting}
               />
@@ -160,7 +167,7 @@ export default function CreateRide() {
                 type="number"
                 placeholder="Number of passengers"
                 value={numPassengers}
-                onChange={(e) => handlePassengerChange(Number(e.target.value))}
+                onChange={(e) => handlePassengerChange(e.target.value)}
                 min="1"
                 className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"
                 disabled={isSubmitting}
