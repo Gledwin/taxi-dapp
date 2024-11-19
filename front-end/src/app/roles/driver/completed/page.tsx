@@ -6,6 +6,7 @@ import { Ride } from "@/entities/taxiRide";
 import { getAllRides } from "@/services/getAllRides";
 import Footer from "@/components/footer";
 import Link from "next/link";
+import { formatEther } from "viem"; // Import for conversion
 import Spinner from "@/components/spinner";
 import { FaCalendarAlt, FaMoneyBillWave, FaMapMarkerAlt, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
@@ -116,7 +117,7 @@ function CompletedRidesContent() {
                               </li>
                               <li className="flex items-center gap-2">
                                 <FaMoneyBillWave className="text-green-600" />{" "}
-                                <span>{ride.fareInEthers} cUSD</span>
+                                <span>{formatEther(BigInt(ride.fareInEthers))} cUSD</span>
                               </li>
                               <li className="flex items-center gap-2">
                                 <strong className="text-green-600">License plate:</strong> {ride.licensePlate}

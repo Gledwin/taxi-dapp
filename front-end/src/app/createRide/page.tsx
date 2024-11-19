@@ -143,7 +143,7 @@ export default function CreateRide() {
               <input
                 id="fareInEthers"
                 type="number"
-                placeholder="Fare in ethers"
+                placeholder="Fare"
                 value={fareInEthers}
                 onChange={(e) => handleFareChange(Number(e.target.value))}
                 className="border border-green-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-200"

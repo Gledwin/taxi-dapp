@@ -16,6 +16,8 @@ import {
   FaMoneyBill,
   FaCalendarAlt,
 } from "react-icons/fa";
+import { formatEther } from "viem"; // Import for conversion
+
 
 interface PaymentWithUser extends Payment {
   username: string;
@@ -122,7 +124,7 @@ export default function RideOverview() {
                 <div>
                   <p className="flex items-center text-white space-x-2">
                     <FaMoneyBill className="text-xl" />
-                    <span><strong>Fare:</strong> {rideWithEarnings.fareInEthers} cUSD</span>
+                    <span><strong>Fare:</strong>  {formatEther(BigInt(rideWithEarnings.fareInEthers))} cUSD</span>
                   </p>
                 </div>
                 <div>
@@ -138,7 +140,7 @@ export default function RideOverview() {
             <div className="p-6 bg-green-800 rounded-lg shadow-lg text-center hover:scale-105 transform transition-all duration-300">
               <h5 className="text-xl font-bold text-white mb-2">Total Earnings</h5>
               <p className="text-3xl font-extrabold text-white">
-                {rideWithEarnings.totalEarnings.toFixed(2)} cUSD
+                {formatEther(BigInt(rideWithEarnings.totalEarnings))} cUSD
               </p>
             </div>
 
@@ -170,7 +172,7 @@ export default function RideOverview() {
                       {/* Payment Details */}
                       <div className="space-y-3 text-white">
                         <p className=" text-lg">
-                          <strong>Paid:</strong> {payment.amountPaidInEthers.toString()} cUSD
+                          <strong>Paid:</strong> {formatEther(BigInt(payment.amountPaidInEthers.toString()))} cUSD
                         </p>
                         <p className=" text-lg">
                           <strong>Paid at:</strong> {new Date(Number(payment.paidAt) * 1000).toLocaleString()}

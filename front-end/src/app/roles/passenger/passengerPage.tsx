@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { parseUnits } from "viem";
+import { formatEther, formatUnits, parseUnits } from "viem";
 import { Ride } from "@/entities/taxiRide";
 import { Payment } from "@/entities/payments";
 import { payForRide } from "@/services/payForRide";
@@ -151,7 +151,7 @@ export default function PassengerPage({
   };
 
   const inProgressRides = rides.filter(
-    (ride) => !ride.isCompleted && ride.licensePlate.toLowerCase().includes(searchQuery.toLowerCase())
+    (ride) => !ride.isCompleted && ride.licensePlate.toLowerCase().includes(searchQuery.toLowerCase()) 
   );
 
   const groupedPaymentsByMonthAndYear = allPayments.reduce((acc, payment) => {
@@ -262,11 +262,11 @@ export default function PassengerPage({
                         <span className="bg-gray-200 text-gray-900 text-sm px-2 py-1 rounded">{ride.licensePlate}</span>
                       </p>
                       <p className="text-gray-800 mb-4">
-                        <strong>
-                          <FaMoneyBill className="inline mr-1" /> Fare:
-                        </strong>{" "}
-                        {ride.fareInEthers} cUSD
-                      </p>
+                          <strong>
+                            <FaMoneyBill className="inline mr-1" /> Fare:
+                          </strong>{" "}
+                          {formatEther(BigInt(ride.fareInEthers))} cUSD
+                        </p>
                       <p className="text-gray-800 mb-4">
                         <strong>
                           <FaUsers className="inline mr-1" /> Passengers Still to Pay:
@@ -372,7 +372,7 @@ export default function PassengerPage({
                           <FaMoneyBill className="inline mr-1 text-green-500" />
                           Amount Paid:{" "}
                           <span className="font-bold text-gray-700">
-                            {payment.amountPaidInEthers} cUSD
+                            {formatEther(BigInt(payment.amountPaidInEthers))} cUSD
                           </span>
                         </p>
                         <p className="text-sm text-gray-500">
@@ -406,4 +406,6 @@ export default function PassengerPage({
       <Footer />
     </>
   );
-}
+} 
+
+

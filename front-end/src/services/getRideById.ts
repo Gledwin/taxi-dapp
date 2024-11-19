@@ -9,7 +9,7 @@ type RideContractResponse = {
   id: bigint;
   driverWalletAddress:  `0x${string}`;
   destination: string;
-  fareInEthers: bigint;
+  fareInEthers: number;
   createdAt: bigint;
   updatedAt: bigint;
   isBooked: boolean;

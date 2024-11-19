@@ -33,6 +33,8 @@ interface PaymentWithUser extends Payment {
   username: string;
 }
 
+import { formatEther } from "viem"; // Import for conversion
+
 export default function DriverPage({
   address,
   rides,
@@ -45,13 +47,17 @@ export default function DriverPage({
   const [ridePayments, setRidePayments] = useState<Record<string, PaymentWithUser[]>>({});
   const [loadingAction, setLoadingAction] = useState(false);
 
-  const incompleteRides = rides.filter((ride) => !ride.isCompleted);
+  // Convert `fareInEthers` to Ether
+  const incompleteRides = rides.filter((ride) => !ride.isCompleted).map((ride) => ({
+    ...ride,
+    fareInEthers: formatEther(BigInt(ride.fareInEthers)), // Convert Wei to Ether
+  }));
 
   useEffect(() => {
     const fetchBalance = async () => {
       try {
         const balance = await getBalance(address);
-        setBalance(balance);
+        setBalance(balance); // Leave balance as-is
       } catch (error) {
         console.error("Error fetching balance:", error);
       }
@@ -102,7 +108,7 @@ export default function DriverPage({
           ? `Ride ${rideId} marked as complete!`
           : `Failed to mark ride ${rideId} as complete.`
       );
-  
+
       if (success) {
         setTimeout(() => {
           window.location.reload(); // Force a full-page reload
@@ -115,7 +121,6 @@ export default function DriverPage({
       setLoadingAction(false);
     }
   };
-  
 
   useEffect(() => {
     if (message) {
@@ -137,11 +142,11 @@ export default function DriverPage({
         </div>
       )}
 
-     {message && (
-          <div className="fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-green-800 shadow-lg">
-            {message}
-          </div>
-        )}
+      {message && (
+        <div className="fixed top-0 left-0 right-0 p-4 text-center z-50 text-white bg-green-800 shadow-lg">
+          {message}
+        </div>
+      )}
 
       <main className="flex flex-col items-center p-4 min-h-screen">
         <div className="bg-green-800 w-full max-w-md p-8 rounded-3xl shadow-lg text-white mb-8">
@@ -152,24 +157,23 @@ export default function DriverPage({
           <p className="text-left text-5xl font-bold mt-4 mb-6">{balance} cUSD</p>
         </div>
         <div className="w-full max-w-md mb-6 flex justify-around text-white gap-4">
-  <button
-    onClick={() => router.push("/createRide")}
-    className="bg-green-800 rounded-3xl flex-1 p-4 flex flex-col items-center shadow-md hover:bg-green-500 transition"
-    style={{ height: "80px" }} 
-  >
-    <FaTaxi size={24} />
-    <span className="text-sm font-semibold mt-2">Create a Ride</span>
-  </button>
-  <button
-    onClick={() => router.push(`/roles/driver/completed?address=${address}`)}
-    className="bg-green-800 rounded-3xl flex-1 p-4 flex flex-col items-center shadow-md hover:bg-green-500 transition"
-    style={{ height: "80px" }} 
-  >
-    <FaCheckCircle size={32} />
-    <span className="text-sm font-semibold mt-2">Completed Rides</span>
-  </button>
-</div>
-
+          <button
+            onClick={() => router.push("/createRide")}
+            className="bg-green-800 rounded-3xl flex-1 p-4 flex flex-col items-center shadow-md hover:bg-green-500 transition"
+            style={{ height: "80px" }}
+          >
+            <FaTaxi size={24} />
+            <span className="text-sm font-semibold mt-2">Create a Ride</span>
+          </button>
+          <button
+            onClick={() => router.push(`/roles/driver/completed?address=${address}`)}
+            className="bg-green-800 rounded-3xl flex-1 p-4 flex flex-col items-center shadow-md hover:bg-green-500 transition"
+            style={{ height: "80px" }}
+          >
+            <FaCheckCircle size={32} />
+            <span className="text-sm font-semibold mt-2">Completed Rides</span>
+          </button>
+        </div>
 
         <div className="w-full max-w-md space-y-4">
           <h5 className="text-2xl font-semibold text-green-800 mb-2">Current Rides</h5>
@@ -181,7 +185,6 @@ export default function DriverPage({
                   key={ride.id.toString()}
                   className="bg-green-800 rounded-3xl p-6 shadow-lg text-white"
                 >
-
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold flex items-center gap-2">
                       <FaMapMarkerAlt className="text-white" /> {ride.destination}
@@ -211,42 +214,13 @@ export default function DriverPage({
                   >
                     Mark as Complete
                   </button>
-
-                  <div className="mt-6 ">
-                    <h4 className="font-bold text-gray-200 mb-2">Payments</h4>
-                    {ridePayments[ride.id.toString()] &&
-                    ridePayments[ride.id.toString()].length > 0 ? (
-                      <div className="space-y-4">
-                        {ridePayments[ride.id.toString()].map((payment) => (
-                          <div
-                            key={payment.id}
-                            className="bg-green-800 p-4 rounded-lg shadow-md"
-                          >
-                            <div className="flex justify-between items-center mb-2">
-                              <p className="font-bold text-white flex items-center gap-2">
-                                <FaWallet /> {payment.username}
-                              </p>
-                              <p className="text-xs text-gray-400">
-                                <FaClock className="inline-block mr-1" />
-                                {new Date(Number(payment.paidAt) * 1000).toLocaleString()}
-                              </p>
-                            </div>
-                            <p>
-                              <strong className="text-gray-300">Paid:</strong>{" "}
-                              <span className="text-green-400">{payment.amountPaidInEthers} cUSD</span>
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-400 ">No payments yet.</p>
-                    )}
-                  </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-centerfont-medium bg-gray-200 p-4 rounded-lg text-green-800">No rides available.</p>
+            <p className="text-centerfont-medium bg-gray-200 p-4 rounded-lg text-green-800">
+              No rides available.
+            </p>
           )}
         </div>
       </main>
@@ -255,3 +229,4 @@ export default function DriverPage({
     </>
   );
 }
+
